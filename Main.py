@@ -2,6 +2,7 @@ import User
 import sqlite3
 from getpass import getpass
 from Database import create_or_connect_db
+import Consultant
 
 def main():
     create_or_connect_db()

@@ -19,7 +19,7 @@ def create_or_connect_db():
     Cities = "('Papendrecht', 'Delft', 'Rotterdam', 'Den Haag', 'Schiedam', 'Zwolle', 'Leiden', 'Groningen', 'Maastricht', 'Urk')"
 
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS Members (
-                    member_id INTEGER PRIMARY KEY,
+                    member_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
                     first_name TEXT NOT NULL,
                     last_name TEXT NOT NULL,
