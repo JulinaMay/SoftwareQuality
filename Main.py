@@ -6,7 +6,7 @@ import Consultant
 
 def main():
     create_or_connect_db()
-    Login()
+    Consultant.proces_member_request()
 
 def Login():
     response = input("Do you have an account? (y/n) ")
