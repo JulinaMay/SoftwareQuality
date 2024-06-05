@@ -5,6 +5,8 @@ def proces_member_request():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
+    print(" MEMBER REQUEST\n----------------")
+
     # Get information from user
     user_found = False
     while user_found == False:

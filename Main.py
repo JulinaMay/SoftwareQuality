@@ -3,9 +3,11 @@ import sqlite3
 from getpass import getpass
 from Database import create_or_connect_db
 import Consultant
+from os import system, name
 
 def main():
     create_or_connect_db()
+    clear()
     Consultant.proces_member_request()
 
 def Login():
@@ -35,9 +37,13 @@ def Login():
         print("Invalid input. Please try again.")
         Login()
 
-
+def clear():
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+    # for mac and linux
+    else:
+        _ = system('clear')
+    
 if __name__ == "__main__":
     main()
-
-
-    
