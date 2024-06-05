@@ -9,7 +9,7 @@ def main():
     create_or_connect_db()
     clear()
     Login()
-    Consultant.proces_member_request()
+    Consultant.process_member_request()
 
 def Login():
     response = input("Do you have an account? (y/n) ")

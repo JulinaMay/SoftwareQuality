@@ -2,7 +2,7 @@ import sqlite3
 import re
 import Database
 
-def proces_member_request():
+def process_member_request():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
