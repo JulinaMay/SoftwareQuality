@@ -8,6 +8,7 @@ from os import system, name
 def main():
     create_or_connect_db()
     clear()
+    Login()
     Consultant.proces_member_request()
 
 def Login():
