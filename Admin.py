@@ -10,7 +10,8 @@ def menu(username):
     user_data = cursor.fetchone()
 
     role_level  = user_data[2]
-    print(f"Welcome {role_level} {username}!")
+    print(f"Welcome {username} ({role_level})")
+    print("\n--- System Admin Menu ---")
     #Eigen gegevens
     #List van users
 

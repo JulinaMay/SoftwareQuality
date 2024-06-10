@@ -4,6 +4,7 @@ import Database
 import getpass
 import bcrypt
 import Main
+import time
 
 # MENU
 
@@ -18,13 +19,15 @@ def menu(username):
 
     while True:
         Main.clear()
-        print(f"Welcome {role_level} {username}")
+        print(f"Welcome {username} ({role_level})")
+        print("\n--- Consultant Menu ---")
 
         print("1. Update password")
         print("2. Process member request")
         print("3. Modify member")
         print("4. Retrieve member")
         print("5. Exit")
+
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
         if choice == "1":
@@ -49,19 +52,19 @@ def update_password(username): # TODO: Add validation
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    print(" UPDATE PASSWORD\n-----------------")
+    print("\n--- Update Password ---")
 
     # Login with current password
     cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
     user_data = cursor.fetchone()
 
     # Check if password is correct
-    input_password = input("Enter your current password: ")
+    input_password = getpass("Enter your current password: ")
     if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
         print("Incorrect password")
         return False
     else:
-        new_password = input("Enter your new password: ")
+        new_password = getpass("Enter your new password: ")
         hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
         cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
         connection.commit()
@@ -73,7 +76,7 @@ def process_member_request():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    print(" MEMBER REQUEST\n----------------")
+    print("\n--- Process Member Request ---")
 
     # Get information from user
     user_found = False
@@ -173,6 +176,10 @@ def process_member_request():
 
     connection.commit()
     connection.close()
+
+    Main.clear()
+    print("Member request processed successfully")
+    time.sleep(2)
 
     return (first_name, last_name)
 

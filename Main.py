@@ -6,11 +6,12 @@ import Consultant
 import Admin
 import Database
 from os import system, name
+import time
 
 def main():
     Database.create_or_connect_db()
-    clear()
     while True:
+        clear()
         # Voor als je nog niet hebt ingelogd?
         print("\n--- Main Menu ---")
         print("1. Create account")
@@ -43,20 +44,21 @@ def Login():
         
         # Login validation
         if user_data:
+            username   = user_data[0]
             stored_hash = user_data[1]
             role_level  = user_data[2]
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
-                print(f"\nLogin succes!")
-                print(f"Logged in as {role_level}")
                 # check wie er is ingelogd en toon verschillende menus
                 if role_level == "consultant":
-                    Consultant.menu()
+                    Consultant.menu(username)
                 elif role_level == "admin":
                     Admin.menu(username)
             else:
                 print("Login failed")
+                time.sleep(2)
         else:
-            print("Users not found")
+            print("User not found")
+            time.sleep(2)
         connection.close()
 
     # Create account
