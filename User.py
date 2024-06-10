@@ -2,9 +2,12 @@ import sqlite3
 import bcrypt
 from getpass import getpass
 import bcrypt
+import Main
 
 def create_account():
     while True:
+        Main.clear()
+        print("\n--- Create Account ---")
         userName = input("Enter a username: ")
 
         connection = sqlite3.connect("MealManagement.db")

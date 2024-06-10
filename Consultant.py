@@ -26,7 +26,7 @@ def menu(username):
         print("2. Process member request")
         print("3. Modify member")
         print("4. Retrieve member")
-        print("5. Exit")
+        print("5. Logout")
 
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
@@ -41,7 +41,9 @@ def menu(username):
         elif choice == "4":
             print("Retrieve member data")
         elif choice == "5":
-            print("Exiting the program. Goodbye!")
+            Main.clear()
+            print(f"Logging out. Goodbye {username}!")
+            time.sleep(2)
             break
         else:
             print("Invalid input")
