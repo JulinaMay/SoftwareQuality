@@ -4,6 +4,18 @@ import Database
 import getpass
 import bcrypt
 
+# MENU
+
+def menu(username):
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username))
+    user_data = cursor.fetchone()
+
+    role_level = user_data[2]
+    print(f"Welcome {role_level} {username}")
+
 # ACTIONS
 
 def update_password(username): # TODO: Add validation
