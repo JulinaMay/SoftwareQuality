@@ -1,9 +1,10 @@
-import User
 import sqlite3
 import bcrypt
 from getpass import getpass
-from Database import create_or_connect_db
+import User
 import Consultant
+import Admin
+from Database import create_or_connect_db
 from os import system, name
 
 def main():
@@ -38,15 +39,21 @@ def Login():
         connection = sqlite3.connect("MealManagement.db")
         cursor = connection.cursor()
 
-        cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
+        cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username,))
         user_data = cursor.fetchone()
         
         # Login validation
         if user_data:
             stored_hash = user_data[1]
+            role_level  = user_data[2]
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
-                print("Login succes")
-                
+                print(f"\nLogin succes!")
+                print(f"Logged in as {role_level}")
+                # check wie er is ingelogd en toon verschillende menus
+                if role_level == "consultant":
+                    Consultant.menu()
+                elif role_level == "admin":
+                    Admin.menu(username)
             else:
                 print("Login failed")
         else:
