@@ -1,7 +1,7 @@
 import sqlite3
 import bcrypt
 from getpass import getpass
-# import bcrypt
+import bcrypt
 
 def create_account():
     while True:
