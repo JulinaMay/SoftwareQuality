@@ -4,8 +4,8 @@ import sqlite3
 def create_account():
     userName = input("Enter a username: ")
     password = input("Enter a password: ")
-    firstName = input("Enter your first name: ")
-    lastName = input("Enter your last name: ")
+    firstName = input("Enter your first name: ").strip()
+    lastName = input("Enter your last name: ").strip()
     roleLevel = "user"
 
     # Hash Password

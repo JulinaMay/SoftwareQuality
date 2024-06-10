@@ -9,7 +9,11 @@ def main():
     create_or_connect_db()
     clear()
     Login()
-    Consultant.process_member_request()
+    # Todo: Check role and show the appropriate menu
+    
+    user = Consultant.process_member_request()
+    clear()
+    print(f"{user[0]} {user[1]} is now a member")
 
 def Login():
     response = input("Do you have an account? (y/n) ")
@@ -23,17 +27,20 @@ def Login():
         cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
         user_data = cursor.fetchone()
         
+        # Login validation
         if user_data:
             if user_data[1] == password:
                 print("Login succes")
             else:
-                print("Fail")
+                print("Login failed")
         else:
             print("Users not found")
         connection.close()
 
+    # Create account
     elif response == "n":
         User.create_account()
+    # Invalid input
     else:
         print("Invalid input. Please try again.")
         Login()
