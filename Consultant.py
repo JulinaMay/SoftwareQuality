@@ -5,6 +5,7 @@ import getpass
 import bcrypt
 import Main
 import time
+import random
 
 # MENU
 
@@ -170,8 +171,18 @@ def process_member_request():
         phone_number = input("Enter phone number: ").strip()
         loop = validate_phone_number(phone_number)
 
+    #  Create unique member_id
+    member_id = ""
+    checksum = 0
+    for i in range(9):
+        random_number = random.randint(0, 9)
+        member_id += str(random_number) 
+        checksum += random_number
+    checksum %= 10
+    member_id += str(checksum)
+
     # Insert member into Members table
-    cursor.execute(f"INSERT INTO Members (user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
+    cursor.execute(f"INSERT INTO Members (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
 
     # Update role level in Users table
     cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{user_id}'")
