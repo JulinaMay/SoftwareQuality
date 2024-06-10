@@ -9,25 +9,26 @@ from os import system, name
 def main():
     create_or_connect_db()
     clear()
-    while True:
-        # Voor als je nog niet hebt ingelogd?
-        print("\n--- Main Menu ---")
-        print("1. Create account")
-        print("2. Login")
-        print("3. Exit")
+    Consultant.menu("meep")
+    # while True:
+    #     # Voor als je nog niet hebt ingelogd?
+    #     print("\n--- Main Menu ---")
+    #     print("1. Create account")
+    #     print("2. Login")
+    #     print("3. Exit")
         
-        choice = input("Choose an option (1/2/3): ").strip()
+    #     choice = input("Choose an option (1/2/3): ").strip()
 
-        if choice == "1":
-            User.create_account()
-        elif choice == "2":
-            Login()
-        elif choice == "3":
-            print("Exiting the program. Goodbye!")
-            break
-        else:
-            print("Invalid input")
-    # Consultant.process_member_request()
+    #     if choice == "1":
+    #         User.create_account()
+    #     elif choice == "2":
+    #         Login()
+    #     elif choice == "3":
+    #         print("Exiting the program. Goodbye!")
+    #         break
+    #     else:
+    #         print("Invalid input")
+    # # Consultant.process_member_request()
 
 def Login():
     response = input("Do you have an account? (y/n) ").strip().lower()

@@ -3,6 +3,7 @@ import re
 import Database
 import getpass
 import bcrypt
+import Main
 
 # MENU
 
@@ -10,11 +11,35 @@ def menu(username):
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username))
+    cursor.execute("SELECT username, password, role_level FROM Users WHERE username = ?", (username,))
     user_data = cursor.fetchone()
 
     role_level = user_data[2]
-    print(f"Welcome {role_level} {username}")
+
+    while True:
+        Main.clear()
+        print(f"Welcome {role_level} {username}")
+
+        print("1. Update password")
+        print("2. Process member request")
+        print("3. Modify member")
+        print("4. Retrieve member")
+        print("5. Exit")
+        choice = input("Choose an option (1/2/3/4/5): ").strip()
+
+        if choice == "1":
+            update_password(username)
+        elif choice == "2":
+            process_member_request()
+        elif choice == "3":
+            print("Modify member data")
+        elif choice == "4":
+            print("Retrieve member data")
+        elif choice == "5":
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid input")
 
 # ACTIONS
 
