@@ -2,6 +2,9 @@ import sqlite3
 import re
 import Database
 
+
+# Todo: change role level
+
 def process_member_request():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
@@ -14,13 +17,13 @@ def process_member_request():
         # Check if first name is valid
         loop = True
         while loop:
-            first_name = input("Enter first name: ").strip().capitalize()
+            first_name = input("Enter first name: ").strip()
             loop = validate_first_name(first_name)
 
         # Check if last name is valid
         loop = True
         while loop:
-            last_name = input("Enter last name: ").strip().capitalize()
+            last_name = input("Enter last name: ").strip()
             loop = validate_last_name(last_name)
 
         # Check if user exists in Users table
@@ -101,8 +104,13 @@ def process_member_request():
     # Insert member into Members table
     cursor.execute(f"INSERT INTO Members (user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
 
+    # Update role level in Users table
+    cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{user_id}'")
+
     connection.commit()
     connection.close()
+
+    return (first_name, last_name)
 
 def validate_first_name(first_name):
     pattern = r"^[a-zA-Z]+$" # A-Z, a-z

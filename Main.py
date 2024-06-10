@@ -41,19 +41,22 @@ def Login():
         cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
         user_data = cursor.fetchone()
         
+        # Login validation
         if user_data:
             stored_hash = user_data[1]
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
                 print("Login succes")
                 
             else:
-                print("Fail")
+                print("Login failed")
         else:
             print("Users not found")
         connection.close()
 
+    # Create account
     elif response == "n":
         User.create_account()
+    # Invalid input
     else:
         print("Invalid input. Please try again.")
         Login()
