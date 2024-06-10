@@ -1,9 +1,34 @@
 import sqlite3
 import re
 import Database
+import getpass
+import bcrypt
 
+# ACTIONS
 
-# Todo: change role level
+def update_password(username): # TODO: Add validation
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+
+    print(" UPDATE PASSWORD\n-----------------")
+
+    # Login with current password
+    cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
+    user_data = cursor.fetchone()
+
+    # Check if password is correct
+    input_password = input("Enter your current password: ")
+    if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
+        print("Incorrect password")
+        return False
+    else:
+        new_password = input("Enter your new password: ")
+        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+        cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
+        connection.commit()
+        connection.close()
+        print("Password updated successfully")
+        return True
 
 def process_member_request():
     connection = sqlite3.connect("MealManagement.db")
@@ -111,6 +136,14 @@ def process_member_request():
     connection.close()
 
     return (first_name, last_name)
+
+def modify_member(type_to_change, new_value, user_id):
+    return
+
+def retrieve_member(type_to_retrieve, user_id):
+    return
+
+# VALIDATION
 
 def validate_first_name(first_name):
     pattern = r"^[a-zA-Z]+$" # A-Z, a-z
