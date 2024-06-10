@@ -38,9 +38,11 @@ def menu(username):
             Main.clear()
             process_member_request()
         elif choice == "3":
-            print("Modify member data")
+            Main.clear()
+            modify_member()
         elif choice == "4":
-            print("Retrieve member data")
+            Main.clear()
+            retrieve_member_data()
         elif choice == "5":
             Main.clear()
             print(f"Logging out. Goodbye {username}!")
@@ -196,11 +198,279 @@ def process_member_request():
 
     return (first_name, last_name)
 
-def modify_member(type_to_change, new_value, user_id):
-    return
+def modify_member():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
 
-def retrieve_member(type_to_retrieve, user_id):
-    return
+    while True:
+        Main.clear()
+        print("\n--- Modify Member ---")
+        print("1. Update member")
+        print("2. Delete member")
+        print("3. Delete user")
+        print("4. Go back")
+        choice = input("Choose an option (1/2/3/4): ").strip()
+
+        # Update member
+        if choice == "1":
+            Main.clear()
+            print("\n--- Update member ---")
+            first_name_user_to_update = input("Enter the first name of the member you want to update: ").strip()
+            last_name_user_to_update = input("Enter the last name of the member you want to update: ").strip()
+            user = cursor.execute("SELECT * FROM Members WHERE first_name = ? AND last_name = ?", (first_name_user_to_update, last_name_user_to_update))
+            if user.fetchone() == None:
+                print("User not found")
+                time.sleep(2)
+                continue
+            else:
+                datatype_to_update = input("Enter the datatype you want to update: ").strip()
+                if datatype_to_update == "first_name":
+                    loop = True
+                    while loop:
+                        first_name = input("Enter new first name: ").strip()
+                        loop = validate_first_name(first_name)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET first_name = ? WHERE first_name = ? AND last_name = ?", (first_name, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("First name updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "last_name":
+                    loop = True
+                    while loop:
+                        last_name = input("Enter last name: ").strip()
+                        loop = validate_last_name(last_name)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET last_name = ? WHERE first_name = ? AND last_name = ?", (last_name, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Last name updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "age":
+                    loop = True
+                    while loop:
+                        age = input("Enter age: ").strip()
+                        loop = validate_age(age)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET age = ? WHERE first_name = ? AND last_name = ?", (age, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Age updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "gender":
+                    loop = True
+                    while loop:
+                        gender = input("Enter gender: ").strip().capitalize()
+                        loop = validate_gender(gender)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET gender = ? WHERE first_name = ? AND last_name =?", (gender, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Gender updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "weight":
+                    loop = True
+                    while loop:
+                        weight = input("Enter weight: ").strip()
+                        loop = validate_weight(weight)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET weight = ? WHERE first_name = ? AND last_name = ?", (weight, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Weight updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "street":
+                    loop = True
+                    while loop:
+                        street = input("Enter street: ").strip().title()
+                        loop = validate_street(street)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET street = ? WHERE first_name = ? AND last_name = ?", (street, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Street updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "house_number":
+                    loop = True
+                    while loop:
+                        house_number = input("Enter house number: ").strip()
+                        loop = validate_house_number(house_number)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET house_number = ? WHERE first_name = ? AND last_name = ?", (house_number, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("House number updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "postal_code":
+                    loop = True
+                    while loop:
+                        postal_code = input("Enter postal code: ").strip()
+                        loop = validate_postal_code(postal_code)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET postal_code = ? WHERE first_name = ? AND last_name = ?", (postal_code, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Postal code updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "city":
+                    loop = True
+                    while loop:
+                        city = input("Enter city: ").strip().capitalize()
+                        loop = validate_city(city)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET city = ? WHERE first_name = ? AND last_name = ?", (city, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("City updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "country":
+                    loop = True
+                    while loop:
+                        country = input("Enter country: ").strip().capitalize()
+                        loop = validate_country(country)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET country = ? WHERE first_name = ? AND last_name = ?", (country, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Country updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "email":
+                    loop = True
+                    while loop:
+                        email = input("Enter email: ").strip().lower()
+                        loop = validate_email(email)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET email = ? WHERE first_name = ? AND last_name = ?", (email, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Email updated successfully")
+                            time.sleep(2)
+                            break
+                elif datatype_to_update == "phone_number":
+                    loop = True
+                    while loop:
+                        phone_number = input("Enter phone number: ").strip()
+                        loop = validate_phone_number(phone_number)
+                        # update member
+                        if not loop:
+                            cursor.execute("UPDATE Members SET phone_number = ? WHERE first_name = ? AND last_name = ?", (phone_number, first_name_user_to_update, last_name_user_to_update))
+                            connection.commit()
+                            print("Phone number updated successfully")
+                            time.sleep(2)
+                            break
+                else:
+                    Main.clear()
+                    print("Invalid input")
+                    time.sleep(2)
+                    continue
+        # Delete member
+        elif choice == "2":
+            Main.clear()
+            print("\n--- Delete member ---")
+            first_name_member_to_delete = input("Enter first name: ").strip()
+            last_name_member_to_delete = input("Enter last name: ").strip()
+            user = cursor.execute("SELECT * FROM Members WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
+            if user.fetchone() == None:
+                print("User not found")
+                time.sleep(2)
+                continue
+            else:
+                sure = input(f"Are you sure you want to delete {first_name_member_to_delete} {last_name_member_to_delete}? (y/n): ").strip().lower()
+                if sure == "y":
+                    Main.clear()
+                    cursor.execute("DELETE FROM Members WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
+                    cursor.execute("UPDATE Users SET role_level = 'user' WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
+                    connection.commit()
+                    print(f"{first_name_member_to_delete} {last_name_member_to_delete} deleted successfully")
+                    time.sleep(2)
+                elif sure == "n":
+                    Main.clear()
+                    print("No user deleted")
+                    time.sleep(2)
+                else:
+                    Main.clear()
+                    print("Invalid input")
+                    time.sleep(2)
+                    continue
+        # Delete user
+        elif choice == "3":
+            Main.clear()
+            print("\n--- Delete user ---")
+            first_name_user_to_delete = input("Enter first name: ").strip()
+            last_name_user_to_delete = input("Enter last name: ").strip()
+            user = cursor.execute("SELECT * FROM Users WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
+            if user.fetchone() == None:
+                print("User not found")
+                time.sleep(2)
+                continue
+            else:
+                sure = input(f"Are you sure you want to delete {first_name_user_to_delete} {last_name_user_to_delete}? (y/n): ").strip().lower()
+                if sure == "y":
+                    Main.clear()
+                    cursor.execute("DELETE FROM Users WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
+                    cursor.execute("DELETE FROM Members WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
+                    connection.commit()
+                    print(f"{first_name_user_to_delete} {last_name_user_to_delete} deleted successfully")
+                    time.sleep(2)
+                elif sure == "n":
+                    Main.clear()
+                    print("No user deleted")
+                    time.sleep(2)
+                else:
+                    Main.clear()
+                    print("Invalid input")
+                    time.sleep(2)
+                    continue
+        # Go back
+        elif choice == "4":
+            break
+        # Invalid input
+        else:
+            Main.clear()
+            print("Invalid input")
+            time.sleep(2)
+
+    connection.commit()
+    connection.close()
+
+def retrieve_member_data():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+
+    while True:
+        Main.clear()
+        print("\n--- Retrieve Member Data ---")
+        print("1. Retrieve member by name")
+        print("2. Retrieve member by id")
+        print("3. Go back")
+        choice = input("Choose an option (1/2/3): ").strip()
+
+        if choice == "1":
+            Main.clear()
+            print("Retrieve member by name")
+            time.sleep(2)
+        elif choice == "2":
+            Main.clear()
+            print("Retrieve member by member_id")
+            time.sleep(2)
+        elif choice == "3":
+            break
+        else:
+            Main.clear()
+            print("Invalid input")
+            time.sleep(2)
+    
+    connection.close()
 
 # VALIDATION
 
