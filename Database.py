@@ -45,4 +45,14 @@ def create_or_connect_db():
     connection.commit()
     connection.close()
 
+def clear_database():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS Users")
+    cursor.execute("DROP TABLE IF EXISTS Members")
+
+    connection.commit()
+    connection.close()
+
 

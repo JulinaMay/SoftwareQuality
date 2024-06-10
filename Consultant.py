@@ -28,8 +28,10 @@ def menu(username):
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
         if choice == "1":
+            Main.clear()
             update_password(username)
         elif choice == "2":
+            Main.clear()
             process_member_request()
         elif choice == "3":
             print("Modify member data")

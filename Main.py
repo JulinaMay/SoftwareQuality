@@ -4,11 +4,11 @@ from getpass import getpass
 import User
 import Consultant
 import Admin
-from Database import create_or_connect_db
+import Database
 from os import system, name
 
 def main():
-    create_or_connect_db()
+    Database.create_or_connect_db()
     clear()
     while True:
         # Voor als je nog niet hebt ingelogd?
@@ -28,7 +28,6 @@ def main():
             break
         else:
             print("Invalid input")
-    # Consultant.process_member_request()
 
 def Login():
     response = input("Do you have an account? (y/n) ").strip().lower()
