@@ -235,7 +235,7 @@ def modify_member():
             cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id_to_update,))
             user = cursor.fetchall()
 
-            if user.fetchone() == []:
+            if user == []:
                 Main.clear()
                 print("User not found")
                 time.sleep(2)
@@ -395,25 +395,29 @@ def modify_member():
         elif choice == "2":
             Main.clear()
             print("\n--- Delete member ---")
-            first_name_member_to_delete = input("Enter first name: ").strip()
-            last_name_member_to_delete = input("Enter last name: ").strip()
-            user = cursor.execute("SELECT * FROM Members WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
-            if user.fetchone() == None:
-                print("User not found")
+            id_to_delete = input("Enter user id: ").strip()
+
+            cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id_to_delete))
+            member = cursor.fetchall()
+            member = member[0]
+
+            if member == []:
+                Main.clear()
+                print("Member not found")
                 time.sleep(2)
                 continue
             else:
-                sure = input(f"Are you sure you want to delete {first_name_member_to_delete} {last_name_member_to_delete}? (y/n): ").strip().lower()
+                sure = input(f"Are you sure you want to delete {member[2]} {member[3]} from member list? (y/n): ").strip().lower()
                 if sure == "y":
                     Main.clear()
-                    cursor.execute("DELETE FROM Members WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
-                    cursor.execute("UPDATE Users SET role_level = 'user' WHERE first_name = ? AND last_name = ?", (first_name_member_to_delete, last_name_member_to_delete))
+                    cursor.execute("DELETE FROM Members WHERE user_id = ?", (id_to_delete))
+                    cursor.execute("UPDATE Users SET role_level = 'user' WHERE user_id = ?", (id_to_delete))
                     connection.commit()
-                    print(f"{first_name_member_to_delete} {last_name_member_to_delete} deleted successfully")
+                    print(f"{member[2]} {member[3]} deleted from member list")
                     time.sleep(2)
                 elif sure == "n":
                     Main.clear()
-                    print("No user deleted")
+                    print("No member deleted")
                     time.sleep(2)
                 else:
                     Main.clear()
@@ -424,21 +428,24 @@ def modify_member():
         elif choice == "3":
             Main.clear()
             print("\n--- Delete user ---")
-            first_name_user_to_delete = input("Enter first name: ").strip()
-            last_name_user_to_delete = input("Enter last name: ").strip()
-            user = cursor.execute("SELECT * FROM Users WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
-            if user.fetchone() == None:
+            id_to_delete = input("Enter id: ").strip()
+
+            cursor.execute("SELECT * FROM Users WHERE user_id = ?", (id_to_delete))
+            user = cursor.fetchall()
+            user = user[0]
+
+            if user == []:
                 print("User not found")
                 time.sleep(2)
                 continue
             else:
-                sure = input(f"Are you sure you want to delete {first_name_user_to_delete} {last_name_user_to_delete}? (y/n): ").strip().lower()
+                sure = input(f"Are you sure you want to delete {user[2]} {user[4]}? (y/n): ").strip().lower()
                 if sure == "y":
                     Main.clear()
-                    cursor.execute("DELETE FROM Users WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
-                    cursor.execute("DELETE FROM Members WHERE first_name = ? AND last_name = ?", (first_name_user_to_delete, last_name_user_to_delete))
+                    cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete))
+                    cursor.execute("DELETE FROM Members WHERE user_id = ?", (id_to_delete))
                     connection.commit()
-                    print(f"{first_name_user_to_delete} {last_name_user_to_delete} deleted successfully")
+                    print(f"{user[2]} {user[3]} deleted successfully")
                     time.sleep(2)
                 elif sure == "n":
                     Main.clear()
