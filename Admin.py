@@ -1,5 +1,9 @@
 # System admin
 import sqlite3
+import Main
+from getpass import getpass
+import bcrypt
+import time
 
 def menu(username):
     
@@ -10,22 +14,98 @@ def menu(username):
     user_data = cursor.fetchone()
 
     role_level  = user_data[2]
-    print(f"Welcome {username} ({role_level})")
-    print("\n--- System Admin Menu ---")
-    #Eigen gegevens
-    #List van users
 
+    while True:
+        print(f"Welcome {username} ({role_level})")
+        print("\n--- System Admin Menu ---")
+
+    #Eigen gegevens
+        print("1. Update password")
+    #List van users
+        print("2. List of users")
     #Add new consultant
     #Modify, update consultant
     #Delete consultant
     #Give consultant temp password
-
+        print("3. Consultant menu")
     #Backup, restore members info, users data
-
     #See logs
-
+        print("4. System")
     #Add new member
     #Modify or update member
     #Delete member (consultant cant do that)
+    # Delete member
     #Search, retriev info of member
+        print("5. Member menu")
+
+        choice = input("Choose an option (1/2/3/4/5): ").strip()
+
+        if choice == "1":
+            Main.clear()
+            update_password(username)
+        elif choice == "2":
+            Main.clear()
+            list_users()
+        elif choice == "3":
+            break
+        elif choice == "4":
+            break
+        elif choice == "5":
+            break
+        else:
+            print("Invalid inpit")
+
+# Functies
+def update_password(username):
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+    Main.clear()
+    print("\n--- Update Password ---")
+
+    # Login with current password
+    cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
+    user_data = cursor.fetchone()
+
+    # Check if password is correct
+    input_password = getpass("Enter your current password: ")
+    if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
+        print("Incorrect password")
+        return False
+    else:
+        while True:
+            Main.clear()
+            print("\n--- Update Password ---")
+            new_password = getpass("Enter your new password: ")
+            if (new_password == ""):
+                Main.clear()
+                print("Password can't be empty")
+                time.sleep(2)
+                continue
+            elif (new_password == input_password):
+                Main.clear()
+                print("New password can't be the same as the old password")
+                time.sleep(2)
+                continue
+            else:
+                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+                cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
+                connection.commit()
+                connection.close()
+                Main.clear()
+                print("Password updated successfully")
+                time.sleep(2)
+                break
+        return True
+
+def list_users():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+    Main.clear()
+    print("\n--- List of users ---")
+
+    # Login with current password
+    cursor.execute("SELECT username, role_level FROM Users")
+    user_data = cursor.fetchall()
+
+    print(f"List of tables\n{user_data}")
 

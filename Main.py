@@ -4,9 +4,12 @@ from getpass import getpass
 import User
 import Consultant
 import Admin
+from SuperAdmin import super_username, super_password
+import SuperAdmin
 import Database
 from os import system, name
 import time
+#Super admin
 
 def main():
     Database.create_or_connect_db()
@@ -62,6 +65,8 @@ def Login():
         else:
             print("Login failed")
             time.sleep(2)
+    elif username == super_username and password == super_password:
+        SuperAdmin.menu()
     else:
         print("User not found")
         time.sleep(2)

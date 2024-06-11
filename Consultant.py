@@ -222,8 +222,8 @@ def modify_member():
         print("\n--- Modify Member ---")
         print("1. Update member")
         print("2. Delete member")
-        print("3. Delete user")
-        print("4. Go back")
+        # print("3. Delete user")
+        print("3. Go back")
         choice = input("Choose an option (1/2/3/4): ").strip()
 
         # Update member
@@ -242,6 +242,20 @@ def modify_member():
                 continue
             else:
                 datatype_to_update = input("Enter the datatype you want to update: ").strip()
+                print("""List of datatypes:
+                      first_name
+                      last_name
+                      age
+                      gender
+                      weight
+                      street
+                      house_number
+                      postal_code
+                      city
+                      country
+                      email
+                      phone_number
+                      """)
                 if datatype_to_update == "first_name":
                     loop = True
                     while loop:
