@@ -54,5 +54,3 @@ def clear_database():
 
     connection.commit()
     connection.close()
-
-

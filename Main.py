@@ -49,7 +49,13 @@ def Login():
         role_level  = user_data[2]
         if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
             # check wie er is ingelogd en toon verschillende menus
-            if role_level == "consultant":
+            if role_level == "user":
+                print("User is not allowed to login")
+                time.sleep(2)
+            elif role_level == "member":
+                print("Member is not allowed to login")
+                time.sleep(2)
+            elif role_level == "consultant":
                 Consultant.menu(username)
             elif role_level == "admin":
                 Admin.menu(username)

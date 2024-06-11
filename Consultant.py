@@ -1,11 +1,11 @@
 import sqlite3
-import re
-import Database
-import getpass
+from getpass import getpass
 import bcrypt
 import Main
 import time
 import random
+import Member
+from Validation import *
 
 # MENU
 
@@ -56,7 +56,7 @@ def menu(username):
 def update_password(username): # TODO: Add validation
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
-
+    Main.clear()
     print("\n--- Update Password ---")
 
     # Login with current password
@@ -69,12 +69,29 @@ def update_password(username): # TODO: Add validation
         print("Incorrect password")
         return False
     else:
-        new_password = getpass("Enter your new password: ")
-        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-        cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
-        connection.commit()
-        connection.close()
-        print("Password updated successfully")
+        while True:
+            Main.clear()
+            print("\n--- Update Password ---")
+            new_password = getpass("Enter your new password: ")
+            if (new_password == ""):
+                Main.clear()
+                print("Password can't be empty")
+                time.sleep(2)
+                continue
+            elif (new_password == input_password):
+                Main.clear()
+                print("New password can't be the same as the old password")
+                time.sleep(2)
+                continue
+            else:
+                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+                cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
+                connection.commit()
+                connection.close()
+                Main.clear()
+                print("Password updated successfully")
+                time.sleep(2)
+                break
         return True
 
 def process_member_request():
@@ -86,32 +103,30 @@ def process_member_request():
     # Get information from user
     user_found = False
     while user_found == False:
-        # Check if first name is valid
-        loop = True
-        while loop:
-            first_name = input("Enter first name: ").strip()
-            loop = validate_first_name(first_name)
-
-        # Check if last name is valid
-        loop = True
-        while loop:
-            last_name = input("Enter last name: ").strip()
-            loop = validate_last_name(last_name)
+        id = input("Enter user id: ").strip()
 
         # Check if user exists in Users table
-        user_cursor = cursor.execute(f"SELECT * FROM Users WHERE first_name = '{first_name}' AND last_name = '{last_name}'")
+        user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
         user = user_cursor.fetchone()
         if user is None:
             print("User not found")
         else:
-            user_id = user[0]
             user_found = True
     
     # Check if user is already a member
-    member = cursor.execute(f"SELECT * FROM Members WHERE user_id = '{user_id}'")
-    if member.fetchone() != None:
+    cursor.execute(f"SELECT * FROM Members WHERE user_id = '{id}'")
+    member = cursor.fetchall()
+    if member != []:
         print("User is already a member")
         return
+    
+    # Get user fullname
+    first_name = user[3]
+    last_name = user[4]
+
+    Main.clear()
+    print("\n--- Process member Request ---")
+    print(f"User: {first_name} {last_name}\n")
 
     # Check if age is valid
     loop = True
@@ -184,10 +199,10 @@ def process_member_request():
     member_id += str(checksum)
 
     # Insert member into Members table
-    cursor.execute(f"INSERT INTO Members (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
+    cursor.execute(f"INSERT INTO Members (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (member_id, id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
 
     # Update role level in Users table
-    cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{user_id}'")
+    cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{id}'")
 
     connection.commit()
     connection.close()
@@ -447,123 +462,56 @@ def retrieve_member_data():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
+    Main.clear()
+    print("\n--- Retrieve Member Data ---")
+    Main.clear()
+    print("\n--- Retrieve member ---")
+    search = input("Search: ").strip()
+    search = f"%{search}%"
+
+    cursor.execute(f"SELECT * FROM Members WHERE first_name LIKE ?", (search,))
+    members = cursor.fetchall()
+    
+    # Check if any members are found
+    if members == []:
+        Main.clear()
+        print("No members found")
+        time.sleep(2)
+        return
+
+    current_member = 0
+    # Show user data
     while True:
         Main.clear()
-        print("\n--- Retrieve Member Data ---")
-        print("1. Retrieve member by name")
-        print("2. Retrieve member by id")
+        print("\n--- Member Data ---")
+        
+        # Show member data
+        Member.ShowData(members[current_member])
+        
+        # Show page number and menu
+        print("\n--- page", current_member + 1, "/", len(members), "---")
+        print("1. Next member")
+        print("2. Previous member")
         print("3. Go back")
         choice = input("Choose an option (1/2/3): ").strip()
-
         if choice == "1":
-            Main.clear()
-            print("Retrieve member by name")
-            time.sleep(2)
+            if current_member == len(members) - 1:
+                Main.clear()
+                print("You have reached the last page")
+                time.sleep(2)
+            else:
+                current_member += 1
         elif choice == "2":
-            Main.clear()
-            print("Retrieve member by member_id")
-            time.sleep(2)
+            if current_member == 0:
+                Main.clear()
+                print("You are already at the first page")
+                time.sleep(2)
+            else:
+                current_member -= 1
         elif choice == "3":
             break
         else:
             Main.clear()
             print("Invalid input")
             time.sleep(2)
-    
     connection.close()
-
-# VALIDATION
-
-def validate_first_name(first_name):
-    pattern = r"^[a-zA-Z]+$" # A-Z, a-z
-    if len(first_name) > 15 or not re.match(pattern, first_name):
-        print("Invalid first name")
-        return True
-    return False
-
-def validate_last_name(last_name):
-    pattern = r"^[a-zA-Z'-](?:[a-zA-Z'-]|\s(?!\s))*[a-zA-Z'-]$" # A-Z, a-z, ', -, spaties
-    if len(last_name) > 20 or not re.match(pattern, last_name):
-        print("Invalid last name")
-        return True
-    return False
-
-def validate_age(age):
-    try:
-        age = int(age)
-    except ValueError:
-        print("Age must be a number")
-        return True
-    if age < 0 or age > 120:
-        print("Invalid age")
-        return True
-    return False
-
-def validate_gender(gender):
-    if gender not in Database.Genders:
-        print("Invalid Gender")
-        return True
-    return False
-
-def validate_weight(weight):
-    try:
-        weight = float(weight)
-    except ValueError:
-        print("Weight must be a number")
-        return True
-    if weight < 0 or weight > 300:
-        print("Invalid weight")
-        return True
-    return False
-
-def validate_street(street):
-    pattern = r"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$" # A-Z, a-z, -, spaties
-    if len(street) > 30 or not re.match(pattern, street):
-        print("Invalid street")
-        return True
-    return False
-
-def validate_house_number(house_number):
-    try:
-        house_number = int(house_number)
-    except ValueError:
-        print("House number must be a number")
-        return True
-    if house_number < 0 or house_number > 10000:
-        print("Invalid house number")
-        return True
-    return False
-
-def validate_postal_code(postal_code):
-    pattern = r"^[1-9][0-9]{3} ?[A-Z]{2}$" # 4 cijfers, spatie, 2 hoofdletters
-    if not re.match(pattern, postal_code):
-        print("Invalid postal code")
-        return True
-    return False
-
-def validate_city(city):
-    if city not in Database.Cities:
-        print("Invalid city")
-        return True
-    return False
-
-def validate_country(country):
-    pattern = r"^[A-Z][a-zA-Z]+$" # First letter capital, rest normal
-    if len(country) > 30 or not re.match(pattern, country):
-        print("Invalid country")
-        return True
-    return False
-
-def validate_email(email):
-    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" # email regex
-    if len(email) > 50 or not re.match(pattern, email):
-        print("Invalid email")
-        return True
-    return False
-
-def validate_phone_number(phone_number):
-    pattern = r"^\+(?:[0-9] ?){6,14}[0-9]$" # telefoonnummer regex
-    if not re.match(pattern, phone_number):
-        print("Invalid phone number")
-        return True
-    return False
