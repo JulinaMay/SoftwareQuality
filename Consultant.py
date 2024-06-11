@@ -230,10 +230,13 @@ def modify_member():
         if choice == "1":
             Main.clear()
             print("\n--- Update member ---")
-            first_name_user_to_update = input("Enter the first name of the member you want to update: ").strip()
-            last_name_user_to_update = input("Enter the last name of the member you want to update: ").strip()
-            user = cursor.execute("SELECT * FROM Members WHERE first_name = ? AND last_name = ?", (first_name_user_to_update, last_name_user_to_update))
-            if user.fetchone() == None:
+            id_to_update = input("Enter user id of the member you want to update: ").strip()
+            
+            cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id_to_update,))
+            user = cursor.fetchall()
+
+            if user.fetchone() == []:
+                Main.clear()
                 print("User not found")
                 time.sleep(2)
                 continue
@@ -246,7 +249,7 @@ def modify_member():
                         loop = validate_first_name(first_name)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET first_name = ? WHERE first_name = ? AND last_name = ?", (first_name, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET first_name = ? WHERE user_id = ?", (first_name, id_to_update))
                             connection.commit()
                             print("First name updated successfully")
                             time.sleep(2)
@@ -258,7 +261,7 @@ def modify_member():
                         loop = validate_last_name(last_name)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET last_name = ? WHERE first_name = ? AND last_name = ?", (last_name, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET last_name = ? WHERE user_id = ?", (last_name, id_to_update))
                             connection.commit()
                             print("Last name updated successfully")
                             time.sleep(2)
@@ -270,7 +273,7 @@ def modify_member():
                         loop = validate_age(age)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET age = ? WHERE first_name = ? AND last_name = ?", (age, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
                             connection.commit()
                             print("Age updated successfully")
                             time.sleep(2)
@@ -282,7 +285,7 @@ def modify_member():
                         loop = validate_gender(gender)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET gender = ? WHERE first_name = ? AND last_name =?", (gender, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET gender = ? WHERE user_id = ?", (gender, id_to_update))
                             connection.commit()
                             print("Gender updated successfully")
                             time.sleep(2)
@@ -294,7 +297,7 @@ def modify_member():
                         loop = validate_weight(weight)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET weight = ? WHERE first_name = ? AND last_name = ?", (weight, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET weight = ? WHERE user_id = ?", (weight, id_to_update))
                             connection.commit()
                             print("Weight updated successfully")
                             time.sleep(2)
@@ -306,7 +309,7 @@ def modify_member():
                         loop = validate_street(street)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET street = ? WHERE first_name = ? AND last_name = ?", (street, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET street = ? WHERE user_id = ?", (street, id_to_update))
                             connection.commit()
                             print("Street updated successfully")
                             time.sleep(2)
@@ -318,7 +321,7 @@ def modify_member():
                         loop = validate_house_number(house_number)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET house_number = ? WHERE first_name = ? AND last_name = ?", (house_number, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET house_number = ? WHERE user_id = ?", (house_number, id_to_update))
                             connection.commit()
                             print("House number updated successfully")
                             time.sleep(2)
@@ -330,7 +333,7 @@ def modify_member():
                         loop = validate_postal_code(postal_code)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET postal_code = ? WHERE first_name = ? AND last_name = ?", (postal_code, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET postal_code = ? WHERE user_id = ?", (postal_code, id_to_update))
                             connection.commit()
                             print("Postal code updated successfully")
                             time.sleep(2)
@@ -342,7 +345,7 @@ def modify_member():
                         loop = validate_city(city)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET city = ? WHERE first_name = ? AND last_name = ?", (city, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET city = ? WHERE user_id = ?", (city, id_to_update))
                             connection.commit()
                             print("City updated successfully")
                             time.sleep(2)
@@ -354,7 +357,7 @@ def modify_member():
                         loop = validate_country(country)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET country = ? WHERE first_name = ? AND last_name = ?", (country, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET country = ? WHERE user_id = ?", (country, id_to_update))
                             connection.commit()
                             print("Country updated successfully")
                             time.sleep(2)
@@ -366,7 +369,7 @@ def modify_member():
                         loop = validate_email(email)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET email = ? WHERE first_name = ? AND last_name = ?", (email, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET email = ? WHERE user_id = ?", (email, id_to_update))
                             connection.commit()
                             print("Email updated successfully")
                             time.sleep(2)
@@ -378,7 +381,7 @@ def modify_member():
                         loop = validate_phone_number(phone_number)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET phone_number = ? WHERE first_name = ? AND last_name = ?", (phone_number, first_name_user_to_update, last_name_user_to_update))
+                            cursor.execute("UPDATE Members SET phone_number = ? WHERE user_id = ?", (phone_number, id_to_update))
                             connection.commit()
                             print("Phone number updated successfully")
                             time.sleep(2)
