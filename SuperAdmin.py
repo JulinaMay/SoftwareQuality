@@ -4,6 +4,7 @@ import Main
 import time
 import pandas as pd
 import User
+from Validation import *
 
 # Hardcoded gegevens
 super_username="super_admin"
@@ -158,7 +159,7 @@ def consultant_menu():
                         loop = validate_username(username)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
+                            cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", ( id_to_update))
                             connection.commit()
                             print("Age updated successfully")
                             time.sleep(2)
