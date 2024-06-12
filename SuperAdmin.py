@@ -7,6 +7,7 @@ import User
 from Validation import *
 import bcrypt
 import random
+import Member
 
 # Hardcoded gegevens
 super_username="super_admin"
@@ -194,14 +195,11 @@ def member_menu():
             modify_user("member")
         elif choice == "3":
             Main.clear()
-            delete_user()
+            delete_user("member")
         elif choice == "4":
             Main.clear()
-            delete_user("admin")
+            search_member()
         elif choice == "5":
-            Main.clear()
-            reset_pw("admin")
-        elif choice == "6":
             break
         else:
             print("Invalid input")
@@ -631,3 +629,61 @@ def add_member():
     time.sleep(2)
 
     return (first_name, last_name)
+
+def search_member():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+
+    Main.clear()
+    print("\n--- Retrieve Member Data ---")
+    Main.clear()
+    print("\n--- Retrieve member ---")
+    search = input("Search: ").strip()
+    search = f"%{search}%"
+
+    cursor.execute(f"SELECT * FROM Members WHERE user_id LIKE ? OR member_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR age LIKE ? OR gender LIKE ? OR weight LIKE ? OR street LIKE ? OR house_number LIKE ? OR postal_code LIKE ? OR city LIKE ? OR country LIKE ? OR email LIKE ? OR phone_number LIKE ?", (search, search, search, search, search, search, search, search, search, search, search, search, search, search))
+    members = cursor.fetchall()
+    
+    # Check if any members are found
+    if members == []:
+        Main.clear()
+        print("No members found")
+        time.sleep(2)
+        return
+
+    current_member = 0
+    # Show user data
+    while True:
+        Main.clear()
+        print("\n--- Member Data ---")
+        
+        # Show member data
+        Member.ShowData(members[current_member])
+        
+        # Show page number and menu
+        print("\n--- page", current_member + 1, "/", len(members), "---")
+        print("1. Next member")
+        print("2. Previous member")
+        print("3. Go back")
+        choice = input("Choose an option (1/2/3): ").strip()
+        if choice == "1":
+            if current_member == len(members) - 1:
+                Main.clear()
+                print("You have reached the last page")
+                time.sleep(2)
+            else:
+                current_member += 1
+        elif choice == "2":
+            if current_member == 0:
+                Main.clear()
+                print("You are already at the first page")
+                time.sleep(2)
+            else:
+                current_member -= 1
+        elif choice == "3":
+            break
+        else:
+            Main.clear()
+            print("Invalid input")
+            time.sleep(2)
+    connection.close()
