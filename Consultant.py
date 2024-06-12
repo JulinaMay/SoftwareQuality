@@ -189,9 +189,10 @@ def process_member_request():
         loop = validate_phone_number(phone_number)
 
     #  Create unique member_id
-    member_id = ""
+    user_registration_year = user[5].split("-")[0]
+    member_id = str(user_registration_year[-2:])
     checksum = 0
-    for i in range(9):
+    for i in range(7):
         random_number = random.randint(0, 9)
         member_id += str(random_number) 
         checksum += random_number
