@@ -6,6 +6,7 @@ import pandas as pd
 import User
 from Validation import *
 import bcrypt
+import random
 
 # Hardcoded gegevens
 super_username="super_admin"
