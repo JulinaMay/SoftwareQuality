@@ -96,3 +96,17 @@ def validate_phone_number(phone_number):
         print("Invalid phone number")
         return True
     return False
+
+def validate_username(username):
+    pattern = r"^[a-zA-Z0-9]+$" # A-Z, a-z, 0-9
+    if len(username) > 15 or not re.match(pattern, username):
+        print("Username must be alphanumeric and at most 15 characters long")
+        return True
+    return False
+
+def validate_password(password):
+    pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$" # 1 hoofdletter, 1 kleine letter, 1 cijfer, 8 karakters
+    if not re.match(pattern, password):
+        print("Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and be at least 8 characters long")
+        return True
+    return False

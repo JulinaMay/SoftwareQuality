@@ -13,6 +13,9 @@ import time
 
 def main():
     Database.create_or_connect_db()
+    main_menu()
+    
+def main_menu():
     while True:
         clear()
         # Voor als je nog niet hebt ingelogd?
