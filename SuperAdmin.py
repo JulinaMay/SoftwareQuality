@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import User
 from Validation import *
+import bcrypt
 
 # Hardcoded gegevens
 super_username="super_admin"
@@ -15,12 +16,7 @@ def menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    # cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username))
-    # user_data = cursor.fetchone()
-
-    # role_level  = user_data[2]
     Main.clear()
-    print(f"Welcome super admin!)")
     print(f"Welcome super admin!")
     print("\n--- Super Admin Menu ---")
     #List van users
@@ -82,16 +78,17 @@ def list_users():
         user_data = cursor.fetchall()
 
         df = pd.DataFrame(user_data, columns=["Username", "Role"])
+        df.index += 1
+        df = df.rename_axis("ID")
         print(df)
 
-        print("\n1. Go back")
-        choice = input("Choose an option 1: ").strip()
-
-        if choice == "1":
+        choice = input("\nGo back? (yes/no) ").strip().lower()
+        if choice == "yes" or choice == "y":
             Main.clear()
             break
         else:
             print("Try again")
+            continue
     connection.close()
 
 #Consultant menu
@@ -105,10 +102,11 @@ def consultant_menu():
         print("2. Make an user a consultant")
         print("3. Modify consultant")
         print("4. Delete a consultant")
-        print("5. Go back")
+        print("5. Reset password of a consultant")
+        print("6. Go back")
 
-        choice = input("Choose an option (1/2/3/4/5): ")
-
+        choice = input("Choose an option (1/2/3/4/5/6): ")
+        
         if choice == "1":
             print("Make a new consultant")
             User.create_account(role="consultant")
@@ -120,6 +118,9 @@ def consultant_menu():
             while user_found == False:
                 id = input("Enter user id: ").strip()
 
+                choice = input("Go back? (yes/no)").strip().lower()
+                if choice == "y":
+                    break
                 # Check if user exists in Users table
                 user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
                 user = user_cursor.fetchone()
@@ -137,10 +138,14 @@ def consultant_menu():
         elif choice == "3":
             Main.clear()
             print("\n--- Update member ---")
-            id_to_update = input("Enter user id of the user you want to update: ").strip()
+            id_to_update = input("Enter the id of the user you want to update: ").strip()
             
             cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_update,))
             user = cursor.fetchall()
+
+            choice = input("Go back? (yes/no) ").strip().lower()
+            if choice == "yes" or choice == "y":
+                break
 
             if user == []:
                 Main.clear()
@@ -148,22 +153,24 @@ def consultant_menu():
                 time.sleep(2)
                 continue
             else:
-                datatype_to_update = input("Enter the datatype you want to update: ").strip()
-                print("""List of datatypes:
+                print("""List of fields:
                       username
                       first_name
                       last_name
                       """)
+                datatype_to_update = input("Enter the field you want to update: ").strip()
+
                 if datatype_to_update == "username":
                     loop = True
                     while loop:
+                        print(f"Username at the moment: {user[0][1]}")
                         username = input("Enter username: ").strip()
                         loop = validate_username(username)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", ( id_to_update))
+                            cursor.execute("UPDATE users SET username = ? WHERE id = ?", (username, id_to_update))
                             connection.commit()
-                            print("Age updated successfully")
+                            print("Username updated successfully")
                             time.sleep(2)
                             break
                 elif datatype_to_update == "first_name":
@@ -173,7 +180,7 @@ def consultant_menu():
                         loop = validate_first_name(first_name)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET first_name = ? WHERE user_id = ?", (first_name, id_to_update))
+                            cursor.execute("UPDATE Members SET first_name = ? WHERE id = ?", (first_name, id_to_update))
                             connection.commit()
                             print("First name updated successfully")
                             time.sleep(2)
@@ -185,13 +192,75 @@ def consultant_menu():
                         loop = validate_last_name(last_name)
                         # update member
                         if not loop:
-                            cursor.execute("UPDATE Members SET last_name = ? WHERE user_id = ?", (last_name, id_to_update))
+                            cursor.execute("UPDATE Members SET last_name = ? WHERE id = ?", (last_name, id_to_update))
                             connection.commit()
                             print("Last name updated successfully")
                             time.sleep(2)
                             break
-        else:
-            print("Invalid input")
-    connection.close()
+                else:
+                    Main.clear()
+                    print("Invalid input")
+                    time.sleep(2)
+                    continue
+        elif choice == "4":
+            Main.clear()
+            print("\n--- Delete consultant ---")
+            id_to_delete = input("Enter the id of the consultant you want to delete: ").strip()
+            
+            cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
+            user = cursor.fetchall()
 
+            choice = input("Go back? (yes/no) ").strip().lower()
+            if choice == "yes" or choice == "y":
+                break
 
+            if user == []:
+                Main.clear()
+                print("User not found")
+                time.sleep(2)
+                continue
+            else:
+                cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
+                connection.commit()
+                print("Consultant deleted successfully")
+                time.sleep(2)
+        elif choice == "5":
+            Main.clear()
+            print("\n--- Reset password of a consultant ---")
+            pw_to_delete = input("Enter the id of the consultant for the password you want to delete: ").strip()
+
+            cursor.execute("SELECT password FROM Users WHERE id = ?", (pw_to_delete,))
+            user = cursor.fetchall()
+
+            choice = input("Go back? (yes/no) ").strip().lower()
+            if choice == "yes" or choice == "y":
+                break
+
+            if user == []:
+                Main.clear()
+                print("User not found")
+                time.sleep(2)
+                continue
+            else:
+                cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), pw_to_delete))
+                connection.commit()
+                print("Password reset successfully")
+                time.sleep(2)
+        elif choice == "6":
+            break
+
+# System admin menu
+def systemadmin_menu():
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+    while True:
+        Main.clear()
+        print("\n--- System admin menu ---")
+        print("1. Make a new system admin")
+        print("2. Make an user an admin")
+        print("3. Modify admin")
+        print("4. Delete a consultant")
+        print("5. Reset password of a consultant")
+        print("6. Go back")
+
+        choice = input("Choose an option (1/2/3/4/5/6): ")
