@@ -4,7 +4,7 @@ from getpass import getpass
 import bcrypt
 import Main
 
-def create_account():
+def create_account(role):
     while True:
         Main.clear()
         print("\n--- Create Account ---")
@@ -32,6 +32,7 @@ def create_account():
                     VALUES (?, ?, ?, ?, ?)""", (userName, hashedPassword, firstName, lastName, roleLevel)
                     )
         connection.commit()
+
         connection.close()
         print("Account created successfully!")
         break

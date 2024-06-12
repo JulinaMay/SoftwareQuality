@@ -16,6 +16,7 @@ def menu():
     # user_data = cursor.fetchone()
 
     # role_level  = user_data[2]
+    Main.clear()
     print(f"Welcome super admin!)")
     print("\n--- Super Admin Menu ---")
     #List van users
@@ -64,26 +65,23 @@ def menu():
 def list_users():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
-    Main.clear()
-    print("\n--- List of users ---")
-    # Login with current password
-    cursor.execute("SELECT username, role_level FROM Users")
-    user_data = cursor.fetchall()
-
-    df = pd.DataFrame(user_data, columns=["Username", "Role"])
-    print(df)
 
     while True:
+        Main.clear()
+        print("\n--- List of users ---")
+        # Login with current password
+        cursor.execute("SELECT username, role_level FROM Users")
+        user_data = cursor.fetchall()
+
+        df = pd.DataFrame(user_data, columns=["Username", "Role"])
+        print(df)
+
         print("\n1. Go back")
-        print("2. Exit")
-        choice = input("Choose an option: ").split()
+        choice = input("Choose an option: ").strip()
 
         if choice == "1":
+            Main.clear()
             break
-        elif choice == "2":
-            print("Exiting the program. Goodbye!")
-            exit()
         else:
             print("Try again")
-
     connection.close()

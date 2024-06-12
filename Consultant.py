@@ -24,19 +24,39 @@ def menu(username):
         print("\n--- Consultant Menu ---")
 
         print("1. Update password")
-        print("2. Process member request")
-        print("3. Modify member")
-        print("4. Retrieve member")
-        print("5. Logout")
-
-        choice = input("Choose an option (1/2/3/4/5): ").strip()
+        print("2. Members menu")
+        print("3. Logout")
+        choice = input("Choose an option (1/2/3): ").strip()
 
         if choice == "1":
             Main.clear()
             update_password(username)
         elif choice == "2":
             Main.clear()
-            process_member_request()
+            print("\n--- Members Menu ---")
+
+            print("1. Process member request")
+            print("2. Modify member")
+            print("3. Retrieve member")
+            print("4. Go back")
+            choice = input("Choose an option (1/2/3/4): ").strip()
+
+            if choice == "1":
+                Main.clear()
+                process_member_request()
+            elif choice == "2":
+                Main.clear()
+                modify_member()
+            elif choice == "3":
+                Main.clear()
+                retrieve_member_data()
+            elif choice == "4":
+                continue
+            else:
+                Main.clear()
+                print("Invalid input")
+                time.sleep(2)
+
         elif choice == "3":
             Main.clear()
             modify_member()
@@ -56,6 +76,7 @@ def menu(username):
 def update_password(username): # TODO: Add validation
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
+
     Main.clear()
     print("\n--- Update Password ---")
 
@@ -81,6 +102,10 @@ def update_password(username): # TODO: Add validation
             elif (new_password == input_password):
                 Main.clear()
                 print("New password can't be the same as the old password")
+                time.sleep(2)
+                continue
+            elif validate_password(new_password):
+                Main.clear()
                 time.sleep(2)
                 continue
             else:
@@ -242,7 +267,6 @@ def modify_member():
                 time.sleep(2)
                 continue
             else:
-                datatype_to_update = input("Enter the datatype you want to update: ").strip()
                 print("""List of datatypes:
                       first_name
                       last_name
@@ -257,6 +281,7 @@ def modify_member():
                       email
                       phone_number
                       """)
+                datatype_to_update = input("Enter the datatype you want to update: ").strip()
                 if datatype_to_update == "first_name":
                     loop = True
                     while loop:
