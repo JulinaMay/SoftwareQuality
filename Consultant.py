@@ -167,7 +167,7 @@ def retrieve_member_data():
     search = input("Search: ").strip()
     search = f"%{search}%"
 
-    cursor.execute(f"SELECT * FROM Members WHERE first_name LIKE ?", (search,))
+    cursor.execute(f"SELECT * FROM Members WHERE user_id LIKE ? OR member_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR age LIKE ? OR gender LIKE ? OR weight LIKE ? OR street LIKE ? OR house_number LIKE ? OR postal_code LIKE ? OR city LIKE ? OR country LIKE ? OR email LIKE ? OR phone_number LIKE ?", (search, search, search, search, search, search, search, search, search, search, search, search, search, search))
     members = cursor.fetchall()
     
     # Check if any members are found
