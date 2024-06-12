@@ -22,8 +22,14 @@ def create_account(role):
         password = getpass("Enter a password: ")
         firstName = input("Enter your first name: ").strip()
         lastName = input("Enter your last name: ").strip()
-        roleLevel = "user"
-
+        if role == "member":
+            roleLevel = "member"
+        elif role == "consultant":
+            roleLevel = "consultant"
+        elif role == "admin":
+            roleLevel = "admin"
+        else:
+            roleLevel = "user"
         # Hash Password
         hashedPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
