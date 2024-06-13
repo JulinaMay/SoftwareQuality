@@ -64,7 +64,7 @@ def validate_house_number(house_number):
     return False
 
 def validate_postal_code(postal_code):
-    pattern = r"^[1-9][0-9]{3} ?[A-Z]{2}$" # 4 cijfers, spatie, 2 hoofdletters
+    pattern = r"^[1-9][0-9]{3}[A-Z]{2}$" # 4 cijfers, 2 hoofdletters
     if not re.match(pattern, postal_code):
         print("Invalid postal code")
         return True
