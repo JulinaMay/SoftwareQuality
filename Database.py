@@ -25,21 +25,21 @@ def create_or_connect_db():
                 """)
 
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS Members (
-                    member_id INTEGER PRIMARY KEY,
-                    user_id INTEGER,
-                    first_name TEXT NOT NULL,
-                    last_name TEXT NOT NULL,
-                    age INTEGER NOT NULL,
-                    gender TEXT NOT NULL CHECK(gender IN {genders_str}),
-                    weight DOUBLE NOT NULL,
-                    street TEXT NOT NULL,
-                    house_number INTEGER NOT NULL,
-                    postal_code TEXT NOT NULL,
-                    city TEXT NOT NULL CHECK(city IN {cities_str}),
-                    country TEXT NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    phone_number TEXT NOT NULL,
-                    FOREIGN KEY (user_id) REFERENCES Users(id)
+                        member_id TEXT PRIMARY KEY,
+                        user_id INTEGER,
+                        first_name TEXT NOT NULL,
+                        last_name TEXT NOT NULL,
+                        age TEXT NOT NULL,
+                        gender TEXT NOT NULL,
+                        weight TEXT NOT NULL,
+                        street TEXT NOT NULL,
+                        house_number TEXT NOT NULL,
+                        postal_code TEXT NOT NULL,
+                        city TEXT NOT NULL,
+                        country TEXT NOT NULL,
+                        email TEXT NOT NULL,
+                        phone_number TEXT NOT NULL,
+                        FOREIGN KEY (user_id) REFERENCES Users(id)
                     )""")
 
     connection.commit()

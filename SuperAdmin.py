@@ -9,6 +9,9 @@ import bcrypt
 import random
 import Member
 
+# cryptography
+from Cryptography import *
+
 # Hardcoded gegevens
 super_username="super_admin"
 super_password="Admin_123?"
@@ -204,7 +207,8 @@ def member_menu():
         else:
             print("Invalid input")
             connection.close()
-            
+
+# Functions   
 def update_role(role):
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
@@ -545,7 +549,7 @@ def add_member():
     print(f"User: {first_name} {last_name}\n")
 
     # Input and validation
-    age = input_and_validate("Enter age: ", validate_age, "0")
+    age = input_and_validate("Enter age: ", validate_age, "18")
     gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender, "Neither")
     weight = input_and_validate("Enter weight (kg): ", validate_weight, "0")
     street = input_and_validate("Enter street: ", validate_street, "Unknown")
@@ -567,6 +571,21 @@ def add_member():
     checksum %= 10
     member_id += str(checksum)
 
+    # encryption
+    enc_member_id = encrypt_data(public_key(), member_id)
+    enc_first_name = encrypt_data(public_key(), first_name)
+    enc_last_name = encrypt_data(public_key(), last_name)
+    enc_age = encrypt_data(public_key(), age)
+    enc_gender = encrypt_data(public_key(), gender)
+    enc_weight = encrypt_data(public_key(), weight)
+    enc_street = encrypt_data(public_key(), street)
+    enc_house_number = encrypt_data(public_key(), house_number)
+    enc_postal_code = encrypt_data(public_key(), postal_code)
+    enc_city = encrypt_data(public_key(), city)
+    enc_country = encrypt_data(public_key(), country)
+    enc_email = encrypt_data(public_key(), email)
+    enc_phone_number = encrypt_data(public_key(), phone_number)
+
     # Insert member into Members table
     cursor.execute(
         """
@@ -575,7 +594,7 @@ def add_member():
             house_number, postal_code, city, country, email, phone_number
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, 
-        (member_id, id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number)
+        (enc_member_id, id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
     )
 
     # Update role level in Users table
