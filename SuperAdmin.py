@@ -171,6 +171,9 @@ def systemadmin_menu():
             print("Invalid input")
             connection.close()
 
+# System menu
+def system_menu():
+    return
 # Member menu
 def member_menu():
     connection = sqlite3.connect("MealManagement.db")
@@ -203,7 +206,7 @@ def member_menu():
         else:
             print("Invalid input")
             connection.close()
-            
+
 def update_role(role):
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
