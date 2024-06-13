@@ -4,6 +4,7 @@ import Main
 from getpass import getpass
 import bcrypt
 import time
+from SuperAdmin import *
 
 def menu(username):
     
@@ -47,11 +48,13 @@ def menu(username):
             Main.clear()
             list_users()
         elif choice == "3":
-            break
+            Main.clear()
+            consultant_menu()
         elif choice == "4":
             break
         elif choice == "5":
-            break
+            Main.clear()    
+            member_menu()
         else:
             print("Invalid inpit")
 
@@ -97,15 +100,5 @@ def update_password(username):
                 break
         return True
 
-def list_users():
-    connection = sqlite3.connect("MealManagement.db")
-    cursor = connection.cursor()
-    Main.clear()
-    print("\n--- List of users ---")
 
-    # Login with current password
-    cursor.execute("SELECT username, role_level FROM Users")
-    user_data = cursor.fetchall()
-
-    print(f"List of tables\n{user_data}")
 
