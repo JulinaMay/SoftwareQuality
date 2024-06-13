@@ -24,10 +24,11 @@ def main_menu():
         print("2. Login")
         print("3. Exit")
         
-        choice = input("Choose an option (1/2/3): ").strip()
+        # choice = input("Choose an option (1/2/3): ").strip()
+        choice = "2"
 
         if choice == "1":
-            User.create_account()
+            User.create_account("user")
         elif choice == "2":
             Login()
         elif choice == "3":
@@ -39,8 +40,10 @@ def main_menu():
 def Login():
     clear()
     print("\n--- Login ---")
-    username = input("Enter your username: ")
-    password = getpass("Enter your password: ")
+    # username = input("Enter your username: ")
+    # password = getpass("Enter your password: ")
+    username = "super_admin"
+    password = "Admin_123?"
 
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()

@@ -3,8 +3,6 @@ from getpass import getpass
 import bcrypt
 import Main
 import time
-import random
-import Member
 from Validation import *
 from SuperAdmin import *
 
@@ -113,7 +111,6 @@ def update_password(username): # TODO: Add validation
                 break
         return True
 
-
 def modify_member():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
@@ -147,4 +144,3 @@ def modify_member():
             time.sleep(2)
 
     connection.close()
-
