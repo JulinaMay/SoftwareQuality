@@ -544,70 +544,22 @@ def add_member():
     print("\n--- Process member Request ---")
     print(f"User: {first_name} {last_name}\n")
 
-    # Check if age is valid
-    loop = True
-    while loop:
-        age = input("Enter age: ").strip()
-        loop = validate_age(age)
-
-    # Check if gender is valid
-    loop = True
-    while loop:
-        gender = input("Enter gender (Male, Female, Neither): ").strip().capitalize()
-        loop = validate_gender(gender)
-
-    # Check if weight is valid
-    loop = True
-    while loop:
-        weight = input("Enter weight (kg): ").strip()
-        loop = validate_weight(weight)
-
-    # Check if street is valid
-    loop = True
-    while loop:
-        street = input("Enter street: ").strip().title()
-        loop = validate_street(street)
-
-    # Check if house number is valid
-    loop = True
-    while loop:
-        house_number = input("Enter house number: ").strip()
-        loop = validate_house_number(house_number)
-
-    # Check if postal code is valid
-    loop = True
-    while loop:
-        postal_code = input("Enter postal code: ").strip()
-        loop = validate_postal_code(postal_code)
-
-    # Check if city is valid
-    loop = True
-    while loop:
-        city = input("Enter city: ").strip().capitalize()
-        loop = validate_city(city)
-
-    # Check if country is valid
-    loop = True
-    while loop:
-        country = input("Enter country: ").strip().capitalize()
-        loop = validate_country(country)
-
-    # Check if email is valid
-    loop = True
-    while loop:
-        email = input("Enter email: ").strip().lower()
-        loop = validate_email(email)
-
-    # Check if phone number is valid
-    loop = True
-    while loop:
-        phone_number = input("Enter phone number: ").strip()
-        loop = validate_phone_number(phone_number)
-
+    # Input and validation
+    age = input_and_validate("Enter age: ", validate_age, "0")
+    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender, "Neither")
+    weight = input_and_validate("Enter weight (kg): ", validate_weight, "0")
+    street = input_and_validate("Enter street: ", validate_street, "Unknown")
+    house_number = input_and_validate("Enter house number: ", validate_house_number, "0")
+    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1111 AA")
+    city = input_and_validate("Enter city: ", validate_city, "Groningen")
+    country = input_and_validate("Enter country: ", validate_country, "Netherlands")
+    email = input_and_validate("Enter email: ", validate_email, "test@test.com")
+    phone_number = input_and_validate("Enter phone number: ", validate_phone_number, "+612345678")
+    
     #  Create unique member_id
     user_registration_year = user[5].split("-")[0]
     member_id = str(user_registration_year[-2:])
-    checksum = 0
+    checksum = sum(int(digit) for digit in member_id)
     for i in range(7):
         random_number = random.randint(0, 9)
         member_id += str(random_number) 
@@ -616,7 +568,15 @@ def add_member():
     member_id += str(checksum)
 
     # Insert member into Members table
-    cursor.execute(f"INSERT INTO Members (member_id, user_id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (member_id, id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number))
+    cursor.execute(
+        """
+        INSERT INTO Members (
+            member_id, user_id, first_name, last_name, age, gender, weight, street,
+            house_number, postal_code, city, country, email, phone_number
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, 
+        (member_id, id, first_name, last_name, age, gender, weight, street, house_number, postal_code, city, country, email, phone_number)
+    )
 
     # Update role level in Users table
     cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{id}'")
@@ -629,6 +589,13 @@ def add_member():
     time.sleep(2)
 
     return (first_name, last_name)
+
+def input_and_validate(prompt, validate_func, default_value=""):
+    loop = True
+    while loop:
+        data = default_value or input(prompt).strip()
+        loop = validate_func(data)
+    return data
 
 def search_member():
     connection = sqlite3.connect("MealManagement.db")
