@@ -3,6 +3,7 @@ import bcrypt
 from getpass import getpass
 import bcrypt
 import Main
+from Cryptography import *
 
 def create_account(role):
     while True:
@@ -33,9 +34,14 @@ def create_account(role):
         # Hash Password
         hashedPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+        # encrypt data
+        enc_username = encrypt_data(public_key(), userName)
+        enc_firstName = encrypt_data(public_key(), firstName)
+        enc_lastName = encrypt_data(public_key(), lastName)
+
         cursor.execute("""INSERT INTO Users (
                     username, password, first_name, last_name, role_level)
-                    VALUES (?, ?, ?, ?, ?)""", (userName, hashedPassword, firstName, lastName, roleLevel)
+                    VALUES (?, ?, ?, ?, ?)""", (enc_username, hashedPassword, enc_firstName, enc_lastName, roleLevel)
                     )
         connection.commit()
 

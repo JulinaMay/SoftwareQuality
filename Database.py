@@ -15,7 +15,7 @@ def create_or_connect_db():
     
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS Users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL UNIQUE,
+                    username TEXT NOT NULL,
                     password TEXT NOT NULL,
                     first_name TEXT NOT NULL,
                     last_name TEXT NOT NULL,

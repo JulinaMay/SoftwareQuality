@@ -542,9 +542,9 @@ def add_member():
         print("User is already a member")
         return
     
-    # Get user fullname
-    first_name = user[3]
-    last_name = user[4]
+    # decrypt user data
+    first_name = decrypt_data(private_key(), user[3])
+    last_name = decrypt_data(private_key(), user[4])
 
     Main.clear()
     print("\n--- Process member Request ---")
