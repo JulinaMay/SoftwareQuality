@@ -2,7 +2,7 @@ from Cryptography import (decrypt_data, private_key)
 
 def ShowData(member):
     print(f"> Name:         {decrypt_data(private_key(), member[2])} {decrypt_data(private_key(), member[3])}")
-    print(f"> Member ID:    {decrypt_data(private_key(), member[0])}")
+    print(f"> Member ID:    {member[0]}")
     print(f"> User ID:      {member[1]}")
     print(f"> Age:          {decrypt_data(private_key(), member[4])}")
     print(f"> Gender:       {decrypt_data(private_key(), member[5])}")

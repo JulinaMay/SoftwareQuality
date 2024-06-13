@@ -574,7 +574,6 @@ def add_member():
     member_id += str(checksum)
 
     # encryption
-    enc_member_id = encrypt_data(public_key(), member_id)
     enc_first_name = encrypt_data(public_key(), first_name)
     enc_last_name = encrypt_data(public_key(), last_name)
     enc_age = encrypt_data(public_key(), age)
@@ -596,7 +595,7 @@ def add_member():
             house_number, postal_code, city, country, email, phone_number
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, 
-        (enc_member_id, id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
+        (member_id, id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
     )
 
     # Update role level in Users table
