@@ -43,9 +43,11 @@ def main_menu():
             Login()
         elif choice == "3":
             print("Exiting the program. Goodbye!")
+            logger.info("Program exited")
             break
         else:
             print("Invalid input")
+            logger.warning("User entered an invalid input in main menu")
 
 def Login():
     clear()
@@ -86,10 +88,10 @@ def Login():
                 logger.warning(f"{first_name} {last_name} tried to login as a member")
                 time.sleep(2)
             elif role_level == "consultant":
-                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} logged in as a consultant")
+                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} (consultant) logged in")
                 Consultant.menu(username)
             elif role_level == "admin":
-                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} logged in as an admin")
+                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} (admin) logged in")
                 Admin.menu(username)
         else:
             print("Login failed")
