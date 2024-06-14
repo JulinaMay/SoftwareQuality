@@ -12,9 +12,12 @@ import time
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Cryptography import *
+import logging
 
 def main():
     Database.create_or_connect_db()
+    logging.basicConfig(filename='MealManagement.log', level=logging.INFO)
+    logging.info("Program started")
     main_menu()
     
 def main_menu():
@@ -27,7 +30,7 @@ def main_menu():
         print("3. Exit")
         
         # choice = input("Choose an option (1/2/3): ").strip()
-        choice = "2"
+        choice = "3"
 
         if choice == "1":
             User.create_account("user")
