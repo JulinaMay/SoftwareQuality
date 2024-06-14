@@ -11,7 +11,6 @@ from os import system, name
 import time
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from Cryptography import *
 
 def main():
     Database.create_or_connect_db()
@@ -46,9 +45,6 @@ def Login():
     # password = getpass("Enter your password: ")
     username = "super_admin"
     password = "Admin_123?"
-
-    if username != "super_admin":
-        username = encrypt_data(public_key(), username)
 
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()

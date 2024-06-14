@@ -8,6 +8,8 @@ from Validation import *
 import bcrypt
 import random
 import Member
+import zipfile
+import os
 
 # cryptography
 from Cryptography import *
@@ -65,7 +67,8 @@ def menu():
             Main.clear()
             systemadmin_menu()
         elif choice == "4":
-            break
+            Main.clear()
+            system_menu()
         elif choice == "5":
             Main.clear()
             member_menu()
@@ -177,7 +180,28 @@ def systemadmin_menu():
 
 # System menu
 def system_menu():
-    return
+    connection = sqlite3.connect("MealManagement.db")
+    cursor = connection.cursor()
+    while True:
+        Main.clear()
+        db_path = "MealManagement.db"
+        backup_path = "backup.sql"
+        zip_path = "backup.zip"
+        print("\n--- System menu ---")
+        print("1. Make a backup")
+        print("2. Restore backup")
+        print("3. See logs")
+        print("4. Go back")
+
+        choice = input("Choose an option (1/2/3/4): ")
+
+        if choice == "1":
+            make_backup(db_path, backup_path)
+            create_zip(backup_path, zip_path)
+            print("Backup created")
+            time.sleep(2)
+        if choice == "2":
+            restore_backup(db_path, zip_path)
 # Member menu
 def member_menu():
     connection = sqlite3.connect("MealManagement.db")
@@ -674,3 +698,19 @@ def search_member():
             print("Invalid input")
             time.sleep(2)
     connection.close()
+
+def make_backup(db_path, backup_path):
+    connection = sqlite3.connect("MealManagement.db")
+
+    with open(backup_path, 'w') as backup_file:
+        for line in connection.iterdump():
+            backup_file.write('%s\n' % line)
+
+    connection.close()
+
+def create_zip(backup_path, zip_path):
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        zipf.write(backup_path), os.path.basename(backup_path)
+
+def restore_backup(db_path, zip_path):
+    return
