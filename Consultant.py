@@ -6,6 +6,9 @@ import time
 from Validation import *
 from SuperAdmin import *
 
+# logging
+from Log_config import logger
+
 # MENU
 
 def menu(username):

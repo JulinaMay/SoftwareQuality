@@ -5,6 +5,9 @@ import bcrypt
 import Main
 from Cryptography import *
 
+# logging
+from Log_config import logger
+
 def create_account(role):
     while True:
         Main.clear()

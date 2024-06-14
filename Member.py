@@ -1,4 +1,6 @@
 from Cryptography import (decrypt_data, private_key)
+# logging
+from Log_config import logger
 
 def ShowData(member):
     print(f"> Name:         {decrypt_data(private_key(), member[2])} {decrypt_data(private_key(), member[3])}")

@@ -6,6 +6,9 @@ import bcrypt
 import time
 from SuperAdmin import *
 
+# logging
+from Log_config import logger
+
 def menu(username):
     
     connection = sqlite3.connect("MealManagement.db")
