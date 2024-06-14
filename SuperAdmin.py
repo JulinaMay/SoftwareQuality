@@ -1,18 +1,26 @@
-#Super Admin
+# Database
 import sqlite3
-import Main
-import time
 import pandas as pd
+
+# Own modules
+import Main
 import User
-from Validation import *
-import bcrypt
-import random
 import Member
+
+# Validation
+from Validation import *
+
+# Logging
+from Log_config import logger
+
+# cryptography and hashing
+import bcrypt
+from Cryptography import *
+
+import time
+import random
 import zipfile
 import os
-
-# cryptography
-from Cryptography import *
 
 # Hardcoded gegevens
 super_username="super_admin"
@@ -77,6 +85,8 @@ def menu():
             break
         else:
             print("Invalid input")
+            logger.warning("User entered invalid input in super admin menu.")
+            time.sleep(2)
             connection.close()
 
 # List of users
@@ -89,6 +99,8 @@ def list_users():
         # Login with current password
         cursor.execute("SELECT username, role_level FROM Users")
         user_data = cursor.fetchall()
+
+        # TODO: Decrypt data
 
         df = pd.DataFrame(user_data, columns=["Username", "Role"])
         df.index += 1
@@ -580,7 +592,7 @@ def add_member():
     weight = input_and_validate("Enter weight (kg): ", validate_weight, "0")
     street = input_and_validate("Enter street: ", validate_street, "Unknown")
     house_number = input_and_validate("Enter house number: ", validate_house_number, "0")
-    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1111 AA")
+    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1111AA")
     city = input_and_validate("Enter city: ", validate_city, "Groningen")
     country = input_and_validate("Enter country: ", validate_country, "Netherlands")
     email = input_and_validate("Enter email: ", validate_email, "test@test.com")
