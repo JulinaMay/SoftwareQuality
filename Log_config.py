@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
+from datetime import datetime
 
 # Ensure the directory exists
 if not os.path.exists('logs'):
@@ -22,3 +23,21 @@ if not logger.hasHandlers():
 
     # Add the handler to the logger
     logger.addHandler(handler)
+
+# Function to log activities
+def log_activity(date, time, username, description, additional_info=None, suspicious='No'):
+    
+    # Pak de huidige tijd
+    now = datetime.now()
+    date = now.strftime("%d-%m-%Y")
+    time = now.strftime("%H:%M:%S")
+    
+    # Construct the log message based on provided information
+    if additional_info:
+        log_entry = f"{date} {time} {username} {description} {additional_info} Suspicious: {suspicious}"
+    else:
+        log_entry = f"{date} {time} {username} {description} Suspicious: {suspicious}"
+    logger.info(log_entry)
+
+    with open(log_file, 'a') as log_file_obj:
+        log_file_obj.write(log_entry)

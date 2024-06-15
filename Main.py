@@ -15,13 +15,14 @@ from getpass import getpass
 from Cryptography import *
 
 # logging
-from Log_config import logger
+from Log_config import logger, log_activity
 
 from os import system, name
 import time
 
 def main():
     Database.create_or_connect_db()
+    log_activity(time.strftime("%Y-%m-%d"), time.strftime("%H:%M:%S"), "System", "Program started", "No", "No") 
     logger.info("Program started")
     main_menu()
     
@@ -44,10 +45,12 @@ def main_menu():
         elif choice == "3":
             print("Exiting the program. Goodbye!")
             logger.info("Program exited")
+            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Program exited", "No", "No")
             break
         else:
             print("Invalid input")
             logger.warning("User entered an invalid input in main menu")
+            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Invalid input in the main menu", "No", "No")
 
 def Login():
     clear()
@@ -81,27 +84,27 @@ def Login():
             # check wie er is ingelogd en toon verschillende menus
             if role_level == "user":
                 print("User is not allowed to login")
-                logger.warning(f"{first_name} {last_name} tried to login as a user")
+                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Attempted login", f"User {first_name} {last_name} is not allowed to login", "No")
                 time.sleep(2)
             elif role_level == "member":
                 print("Member is not allowed to login")
-                logger.warning(f"{first_name} {last_name} tried to login as a member")
+                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Attempted login", f"Member {first_name} {last_name} is not allowed to login", "No")
                 time.sleep(2)
             elif role_level == "consultant":
-                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} (consultant) logged in")
+                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
                 Consultant.menu(username)
             elif role_level == "admin":
-                logger.info(f"{decrypt_data(private_key(), user_data[3])} {decrypt_data(private_key(), user_data[4])} (admin) logged in")
+                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
                 Admin.menu(username)
         else:
             print("Login failed")
-            logger.warning("User entered an invalid password")
+            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login failed", "Entered invalid password", "No")
             time.sleep(2)
     elif username == super_username and password == super_password:
-        logger.info("Super admin logged in")
+        log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "SuperAdmin", "Login successful", "Super admin logged in", "No")
         SuperAdmin.menu()
     else:
-        logger.warning("User inputted an invalid username")
+        log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login failed", "Inputted an invalid username", "No")
         print("User not found")
         time.sleep(2)
     connection.close()

@@ -7,7 +7,7 @@ from Validation import *
 from SuperAdmin import *
 
 # logging
-from Log_config import logger
+from Log_config import *
 
 # MENU
 
@@ -56,15 +56,15 @@ def menu(username):
                 continue
             else:
                 Main.clear()
-                print("Invalid input")
+                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Invalid input in the main menu", "No", "No")
                 time.sleep(2)
         elif choice == "3":
             Main.clear()
-            print(f"Logging out. Goodbye {username}!")
+            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Program exited", "No", "No")
             time.sleep(2)
             break
         else:
-            print("Invalid input")
+            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Invalid input in the main menu", "No", "No")
 
 # ACTIONS
 
@@ -82,7 +82,7 @@ def update_password(username): # TODO: Add validation
     # Check if password is correct
     input_password = getpass("Enter your current password: ")
     if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
-        print("Incorrect password")
+        log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Incorrect password", "No", "No")
         return False
     else:
         while True:
