@@ -43,13 +43,12 @@ def main_menu():
             Login()
         elif choice == "3":
             print("Exiting the program. Goodbye!")
-            logger.info("Program exited")
             log_activity("System", "Program exited", "No", "No")
             break
         else:
             print("Invalid input")
-            logger.warning("User entered an invalid input in main menu")
             log_activity("System", "Invalid input in the main menu", "No", "No")
+            time.sleep(2)
 
 def Login():
     clear()
