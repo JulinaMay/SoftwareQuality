@@ -105,13 +105,9 @@ def list_users():
         decrypted_username = decrypt_data(private_key(), username)
         decrypted_user_data.append((decrypted_username, role))
 
-    df = pd.DataFrame(decrypted_user_data, columns=["Username", "Role"])
-    df.index += 1
-    df = df.rename_axis("ID")
-
     page = 0
     rows_per_page = 10
-    total_pages = (len(df) + rows_per_page - 1) // rows_per_page
+    total_pages = (len(decrypted_user_data) + rows_per_page - 1) // rows_per_page
     while True:
         Main.clear()
         print("\n--- List of users ---")
@@ -120,7 +116,12 @@ def list_users():
         end_row = start_row + rows_per_page
         
         # print(df)
-        print(df.iloc[start_row:end_row])
+        print(f"{'ID':<5}{'Username':<25}{'Role':<10}")
+        print("-" * 40)
+
+        for i, (username, role) in enumerate(decrypted_user_data[start_row:end_row], start=start_row + 1):
+            print(f"{i:<5}{username:<25}{role:<10}")
+
         print(f"\n--- page {page + 1} / {total_pages} ---")
         print("1. Next page")
         print("2. Previous page")
@@ -330,15 +331,14 @@ def update_role(role):
         elif role == "member":
             cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id))
             member = cursor.fetchall()
-            member = member[0]
-            sure = input(f"Are you sure you want to delete {member[2]} {member[3]} from member list? (yes/no): ").strip().lower()
+            decrypt_member = decrypt_data(private_key(), member[0][2])
+            sure = input(f"Are you sure you want to delete {decrypt_member} from member list? (yes/no): ").strip().lower()
             if sure == "yes" or sure == "y":
                 Main.clear()
                 cursor.execute("DELETE FROM Members WHERE user_id = ?", (id))
-                cursor.execute("UPDATE Users SET role_level = 'user' WHERE user_id = ?", (id))
                 connection.commit()
-                print(f"{member[2]} {member[3]} deleted from member list")
-                log_activity(super_username, "Delete member", f"Deleted member: '{member[2]} {member[3]}'", "No")
+                print(f"{decrypt_member} deleted from member list")
+                log_activity(super_username, "Delete member", f"Deleted member: '{decrypt_member}'", "No")
                 time.sleep(2)
             elif sure == "n":
                 Main.clear()
@@ -409,7 +409,7 @@ def modify_user(role):
             if datatype_to_update == "username":
                 loop = True
                 while loop:
-                    print(f"Username at the moment: {user[0][1]}")
+                    print(f"Username at the moment: {decrypted_name}")
                     username = input("Enter username: ").strip()
                     loop = validate_username(username)
                     # update member
