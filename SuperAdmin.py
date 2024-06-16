@@ -1,6 +1,5 @@
 # Database
 import sqlite3
-import pandas as pd
 
 # Own modules
 import Main

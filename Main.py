@@ -35,7 +35,6 @@ def main_menu():
         print("3. Exit")
         
         choice = input("Choose an option (1/2/3): ").strip()
-        # choice = "2"
 
         if choice == "1":
             User.create_account("user")
@@ -102,7 +101,7 @@ def Login():
                 else:
                     log_activity(decrypted_username, "Login failed", "Entered invalid password", "No")
         elif username == super_username and password == super_password:
-            log_activity("SuperAdmin", "Login successful", "Super admin logged in", "No")
+            log_activity(super_username, "Login successful", "Super admin logged in", "No")
             SuperAdmin.menu()
             break
         else:
