@@ -48,6 +48,7 @@ def main_menu():
         else:
             print("Invalid input")
             log_activity("System", "Invalid input in the main menu", "No", "No")
+            time.sleep(2)
 
 def Login():
     clear()

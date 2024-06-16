@@ -94,27 +94,59 @@ def menu():
 def list_users():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
+
+    # Get user data
+    cursor.execute("SELECT username, role_level FROM Users")
+    user_data = cursor.fetchall()
+
+    # Decrypt data
+    decrypted_user_data = []
+    for username, role in user_data:
+        decrypted_username = decrypt_data(private_key(), username)
+        decrypted_user_data.append((decrypted_username, role))
+
+    df = pd.DataFrame(decrypted_user_data, columns=["Username", "Role"])
+    df.index += 1
+    df = df.rename_axis("ID")
+
+    page = 0
+    rows_per_page = 10
+    total_pages = (len(df) + rows_per_page - 1) // rows_per_page
     while True:
         Main.clear()
         print("\n--- List of users ---")
-        # Login with current password
-        cursor.execute("SELECT username, role_level FROM Users")
-        user_data = cursor.fetchall()
 
-        # TODO: Decrypt data
-
-        df = pd.DataFrame(user_data, columns=["Username", "Role"])
-        df.index += 1
-        df = df.rename_axis("ID")
-        print(df)
-
-        choice = input("\nGo back? (yes/no) ").strip().lower()
-        if choice == "yes" or choice == "y":
+        start_row = page * rows_per_page
+        end_row = start_row + rows_per_page
+        
+        # print(df)
+        print(df.iloc[start_row:end_row])
+        print(f"\n--- page {page + 1} / {total_pages} ---")
+        print("1. Next page")
+        print("2. Previous page")
+        print("3. Go back")
+        choice = input("Choose an option (1/2/3): ").strip()
+        if choice == "1":
+            if page == total_pages - 1:
+                print("You have reached the last page")
+                time.sleep(2)
+                continue
+            else:
+                page += 1
+        elif choice == "2":
+            if page == 0:
+                print("You are already at the first page")
+                time.sleep(2)
+                continue
+            else:
+                page -= 1
+        elif choice == "3":
             Main.clear()
             break
         else:
-            print("Try again")
+            print("Invalid input")
             continue
+    
     connection.close()
 
 # Consultant menu
@@ -219,7 +251,7 @@ def system_menu():
             create_zip(backup_path, zip_path)
             print("Backup created")
             time.sleep(2)
-        if choice == "2":
+        elif choice == "2":
             Main.clear()
             print("Are you sure you want to restore the backup? This will delete all current data.")
             choice = input("Choose an option (y/n): ").strip().lower()
@@ -228,6 +260,17 @@ def system_menu():
             else:
                 print("Action cancelled")
                 time.sleep(2)
+        elif choice == "3":
+            date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
+            Main.clear()
+            see_logs(date)
+        elif choice == "4":
+            break
+        else:
+            print("Invalid input")
+            time.sleep(2)
+        connection.close()
+
 # Member menu
 def member_menu():
     connection = sqlite3.connect("MealManagement.db")
@@ -775,6 +818,45 @@ def restore_backup(db_path, zip_path):
         print("Backup restored")
         time.sleep(2)
 
-def see_logs():
-    
-    return
+def see_logs(date=None):
+    file_path = 'logs/MealManagement.log'
+    if date:
+        file_path = f'logs/MealManagement.log.{date}'
+
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            total_lines = len(lines)
+            pages = (total_lines + 19) // 20
+
+            page = 0
+            while True:
+                Main.clear()
+                start_index = page * 20
+                end_index = min((page + 1) * 20, total_lines)
+                current_page_lines = lines[start_index:end_index]
+
+                print(f"\n--- Page {page + 1} / {pages} ---\n")
+                for line in current_page_lines:
+                    print(line.rstrip())
+
+                print("\n1. Next page")
+                print("2. Previous page")
+                print("3. Go back")
+                choice = input("Choose an option (1/2/3): ").strip()
+
+                if choice == "1":
+                    if page < pages - 1:
+                        page += 1
+                elif choice == "2":
+                    if page > 0:
+                        page -= 1
+                elif choice == "3":
+                    break
+                else:
+                    print("Invalid input")
+                    time.sleep(2)
+                
+    except FileNotFoundError:
+        print(f"The file {file_path} does not exist.")
+        time.sleep(2)
