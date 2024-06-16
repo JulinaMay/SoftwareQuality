@@ -7,7 +7,7 @@ import time
 from SuperAdmin import *
 
 # logging
-from Log_config import logger
+from Log_config import *
 
 def menu(username):
     
@@ -59,7 +59,9 @@ def menu(username):
             Main.clear()    
             member_menu()
         else:
-            print("Invalid inpit")
+            Main.clear()
+            log_activity(username, "System", "Invalid input at the modifying menu", "No")
+            time.sleep(2)
 
 # Functies
 def update_password(username):
@@ -76,6 +78,7 @@ def update_password(username):
     input_password = getpass("Enter your current password: ")
     if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
         print("Incorrect password")
+        log_activity(username, "Update password" "Incorrect password", "No")
         return False
     else:
         while True:
@@ -85,11 +88,13 @@ def update_password(username):
             if (new_password == ""):
                 Main.clear()
                 print("Password can't be empty")
+                log_activity(username, "Update password" "Entered nothing", "No")
                 time.sleep(2)
                 continue
             elif (new_password == input_password):
                 Main.clear()
                 print("New password can't be the same as the old password")
+                log_activity(username, "Update password" "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
             else:
@@ -99,6 +104,7 @@ def update_password(username):
                 connection.close()
                 Main.clear()
                 print("Password updated successfully")
+                log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
                 time.sleep(2)
                 break
         return True

@@ -145,6 +145,7 @@ def list_users():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "List of users", "Invalid input in the list of users", "No")
             continue
     
     connection.close()
@@ -169,7 +170,7 @@ def consultant_menu():
             print("Make a new consultant")
             User.create_account("consultant")
             print("\nAdded a new consultant")
-            log_activity(super_username, "Add a consultant", "Added a new consultant", "No", "No")
+            log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
@@ -205,6 +206,7 @@ def systemadmin_menu():
             print("Make a new system admin")
             User.create_account("admin")
             print("\nAdded a new admin")
+            log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
@@ -222,6 +224,7 @@ def systemadmin_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "System", "Invalid input in the admin menu", "No")
             connection.close()
 
 # System menu
@@ -254,11 +257,13 @@ def system_menu():
         elif choice == "2":
             Main.clear()
             print("Are you sure you want to restore the backup? This will delete all current data.")
-            choice = input("Choose an option (y/n): ").strip().lower()
-            if choice == "y":
+            choice = input("Choose an option (yes/no): ").strip().lower()
+            if choice == "y" or choice == "yes":
                 restore_backup(db_path, zip_path)
+                log_activity(super_username, "System", "Backup restored", "No")
             else:
                 print("Action cancelled")
+                log_activity(super_username, "System", "Backup restore cancelled", "No")
                 time.sleep(2)
         elif choice == "3":
             date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
@@ -268,6 +273,7 @@ def system_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "System", "Invalid input in the system menu", "No")
             time.sleep(2)
         connection.close()
 
@@ -294,7 +300,7 @@ def member_menu():
             modify_user("member")
         elif choice == "3":
             Main.clear()
-            delete_user("member")
+            update_role("member")
         elif choice == "4":
             Main.clear()
             search_member()
@@ -302,6 +308,7 @@ def member_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
 
 def update_role(role):
@@ -313,7 +320,7 @@ def update_role(role):
         id = input("Enter the id of the user to change their role: ").strip()
 
         choice = input("Go back? (yes/no)").strip().lower()
-        if choice == "y":
+        if choice == "y" or choice == "yes":
             break
         # Check if user exists in Users table
         user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
@@ -324,21 +331,23 @@ def update_role(role):
             cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id))
             member = cursor.fetchall()
             member = member[0]
-            sure = input(f"Are you sure you want to delete {member[2]} {member[3]} from member list? (y/n): ").strip().lower()
+            sure = input(f"Are you sure you want to delete {member[2]} {member[3]} from member list? (yes/no): ").strip().lower()
             if sure == "yes" or sure == "y":
                 Main.clear()
                 cursor.execute("DELETE FROM Members WHERE user_id = ?", (id))
                 cursor.execute("UPDATE Users SET role_level = 'user' WHERE user_id = ?", (id))
                 connection.commit()
                 print(f"{member[2]} {member[3]} deleted from member list")
+                log_activity(super_username, "Delete member", f"Deleted member: '{member[2]} {member[3]}'", "No")
                 time.sleep(2)
             elif sure == "n":
                 Main.clear()
                 print("No member deleted")
+                log_activity(super_username, "Delete member", "No member deleted", "No")
                 time.sleep(2)
             else:
                 Main.clear()
-                print("Invalid input")
+                log_activity(super_username, "Update role", "Invalid input in the member menu", "No")
                 time.sleep(2)
                 continue
         else:
@@ -348,6 +357,8 @@ def update_role(role):
             connection.commit()
             connection.close()  
             print("Changed succesfully")
+            decrypted_name = decrypt_data(private_key(), user[1])
+            log_activity(super_username, "Update role", f"Changed user: {decrypted_name} into {role}", "No")
             time.sleep(2)
         break
 
@@ -372,11 +383,6 @@ def modify_user(role):
             time.sleep(2)
             continue
         else:
-            print("""List of fields:
-                     username
-                     first_name
-                     last_name
-                    """)
             if role == "member":
                 print("""List of datatypes:
                          first_name
@@ -392,6 +398,12 @@ def modify_user(role):
                          email
                          phone_number
                     """)
+            else:
+                print("""List of fields:
+                     username
+                     first_name
+                     last_name
+                    """)
             datatype_to_update = input("Enter the field you want to update: ").strip()
 
             if datatype_to_update == "username":
@@ -404,7 +416,9 @@ def modify_user(role):
                     if not loop:
                         cursor.execute("UPDATE users SET username = ? WHERE id = ?", (username, id_to_update))
                         connection.commit()
+                        decrypted_name = decrypt_data(private_key(), user[1])
                         print("Username updated successfully")
+                        log_activity(super_username, "Update user", f"Updated username of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
             elif datatype_to_update == "first_name":
@@ -417,6 +431,8 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET first_name = ? WHERE id = ?", (first_name, id_to_update))
                         connection.commit()
                         print("First name updated successfully")
+                        decrypted_name = decrypt_data(private_key(), user[1])
+                        log_activity(super_username, "Updated user", f"Updated username of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
             elif datatype_to_update == "last_name":
@@ -562,8 +578,8 @@ def delete_user(role):
     cursor = connection.cursor()
 
     while True:
-        print("\n--- Delete {role} ---")
-        id_to_delete = input("Enter the id of the {role} you want to delete: ").strip()
+        print(f"\n--- Delete {role} ---")
+        id_to_delete = input(f"Enter the id of the {role} you want to delete: ").strip()
         
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
         user = cursor.fetchall()
@@ -580,7 +596,7 @@ def delete_user(role):
         else:
             cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
             connection.commit()
-            print("Consultant deleted successfully")
+            print(f"{role} deleted successfully")
             time.sleep(2)
 
 def reset_pw(role):

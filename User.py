@@ -6,7 +6,7 @@ import Main
 from Cryptography import *
 
 # logging
-from Log_config import logger
+from Log_config import *
 
 def create_account(role):
     while True:
@@ -20,6 +20,7 @@ def create_account(role):
         cursor.execute("SELECT username FROM Users Where username =?", (userName,))
         if cursor.fetchone():
             print("Username already exists. Please choose another username.")
+            log_activity("", "Create account failed", "Entered already existing username", "No")
             connection.close()
             continue
         
@@ -50,4 +51,5 @@ def create_account(role):
 
         connection.close()
         print("Account created successfully!")
+        log_activity("", "Acount created", f"Account created successfully with the username: '{userName}'", "No")
         break
