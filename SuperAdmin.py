@@ -11,7 +11,7 @@ import Member
 from Validation import *
 
 # Logging
-from Log_config import logger
+from Log_config import *
 
 # cryptography and hashing
 import bcrypt
@@ -82,10 +82,11 @@ def menu():
             member_menu()
         elif choice == "6":
             print("Exiting the program. Goodbye!")
+            log_activity(super_username, "System", "Program exited", "No")
             break
         else:
             print("Invalid input")
-            logger.warning("User entered invalid input in super admin menu.")
+            log_activity(super_username, "System", "Invalid input in the main menu", "No")
             time.sleep(2)
             connection.close()
 
@@ -136,6 +137,7 @@ def consultant_menu():
             print("Make a new consultant")
             User.create_account("consultant")
             print("\nAdded a new consultant")
+            log_activity(super_username, "Add a consultant", "Added a new consultant", "No", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
