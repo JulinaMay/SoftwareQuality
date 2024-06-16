@@ -22,7 +22,7 @@ import time
 
 def main():
     Database.create_or_connect_db()
-    log_activity(time.strftime("%Y-%m-%d"), time.strftime("%H:%M:%S"), "System", "Program started", "No", "No") 
+    log_activity("System", "Program started", "No", "No") 
     logger.info("Program started")
     main_menu()
     
@@ -45,12 +45,12 @@ def main_menu():
         elif choice == "3":
             print("Exiting the program. Goodbye!")
             logger.info("Program exited")
-            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Program exited", "No", "No")
+            log_activity("System", "Program exited", "No", "No")
             break
         else:
             print("Invalid input")
             logger.warning("User entered an invalid input in main menu")
-            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "System", "Invalid input in the main menu", "No", "No")
+            log_activity("System", "Invalid input in the main menu", "No", "No")
 
 def Login():
     clear()
@@ -84,27 +84,27 @@ def Login():
             # check wie er is ingelogd en toon verschillende menus
             if role_level == "user":
                 print("User is not allowed to login")
-                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Attempted login", f"User {first_name} {last_name} is not allowed to login", "No")
+                log_activity(username, "Attempted login", f"User {first_name} {last_name} is not allowed to login", "No")
                 time.sleep(2)
             elif role_level == "member":
                 print("Member is not allowed to login")
-                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Attempted login", f"Member {first_name} {last_name} is not allowed to login", "No")
+                log_activity(username, "Attempted login", f"Member {first_name} {last_name} is not allowed to login", "No")
                 time.sleep(2)
             elif role_level == "consultant":
-                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
+                log_activity(username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
                 Consultant.menu(username)
             elif role_level == "admin":
-                log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
+                log_activity(username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
                 Admin.menu(username)
         else:
             print("Login failed")
-            log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login failed", "Entered invalid password", "No")
+            log_activity(username, "Login failed", "Entered invalid password", "No")
             time.sleep(2)
     elif username == super_username and password == super_password:
-        log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), "SuperAdmin", "Login successful", "Super admin logged in", "No")
+        log_activity("SuperAdmin", "Login successful", "Super admin logged in", "No")
         SuperAdmin.menu()
     else:
-        log_activity(time.strftime("%d-%m-%Y"), time.strftime("%H:%M:%S"), username, "Login failed", "Inputted an invalid username", "No")
+        log_activity(username, "Login failed", "Inputted an invalid username", "No")
         print("User not found")
         time.sleep(2)
     connection.close()

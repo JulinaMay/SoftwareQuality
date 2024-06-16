@@ -25,19 +25,10 @@ if not logger.hasHandlers():
     logger.addHandler(handler)
 
 # Function to log activities
-def log_activity(date, time, username, description, additional_info=None, suspicious='No'):
-    
-    # Pak de huidige tijd
-    now = datetime.now()
-    date = now.strftime("%d-%m-%Y")
-    time = now.strftime("%H:%M:%S")
-    
+def log_activity(username, description, additional_info=None, suspicious='No'):
     # Construct the log message based on provided information
     if additional_info:
-        log_entry = f"{date} {time} {username} {description} {additional_info} Suspicious: {suspicious}"
+        log_entry = f"{username} {description} {additional_info} Suspicious: {suspicious}"
     else:
-        log_entry = f"{date} {time} {username} {description} Suspicious: {suspicious}"
+        log_entry = f"{username} {description} Suspicious: {suspicious}"
     logger.info(log_entry)
-
-    with open(log_file, 'a') as log_file_obj:
-        log_file_obj.write(log_entry)
