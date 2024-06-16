@@ -1,9 +1,10 @@
 import sqlite3
+
 import bcrypt
 from getpass import getpass
-import bcrypt
-import Main
 from Cryptography import *
+
+import Main
 
 # logging
 from Log_config import *

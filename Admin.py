@@ -1,9 +1,12 @@
 # System admin
 import sqlite3
-import Main
+
 from getpass import getpass
 import bcrypt
+
 import time
+
+import Main
 from SuperAdmin import *
 
 # logging
@@ -54,7 +57,7 @@ def menu(username):
             Main.clear()
             consultant_menu()
         elif choice == "4":
-            break
+            system_menu()
         elif choice == "5":
             Main.clear()    
             member_menu()
