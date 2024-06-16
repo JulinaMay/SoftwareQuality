@@ -259,8 +259,9 @@ def system_menu():
                 print("Action cancelled")
                 time.sleep(2)
         elif choice == "3":
+            date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
             Main.clear()
-            see_logs()
+            see_logs(date)
         elif choice == "4":
             break
         else:
@@ -815,6 +816,45 @@ def restore_backup(db_path, zip_path):
         print("Backup restored")
         time.sleep(2)
 
-def see_logs():
+def see_logs(date=None):
+    file_path = 'logs/MealManagement.log'
+    if date:
+        file_path = f'logs/MealManagement.log.{date}'
 
-    return
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            total_lines = len(lines)
+            pages = (total_lines + 19) // 20
+
+            page = 0
+            while True:
+                Main.clear()
+                start_index = page * 20
+                end_index = min((page + 1) * 20, total_lines)
+                current_page_lines = lines[start_index:end_index]
+
+                print(f"\n--- Page {page + 1} / {pages} ---\n")
+                for line in current_page_lines:
+                    print(line.rstrip())
+
+                print("\n1. Next page")
+                print("2. Previous page")
+                print("3. Go back")
+                choice = input("Choose an option (1/2/3): ").strip()
+
+                if choice == "1":
+                    if page < pages - 1:
+                        page += 1
+                elif choice == "2":
+                    if page > 0:
+                        page -= 1
+                elif choice == "3":
+                    break
+                else:
+                    print("Invalid input")
+                    time.sleep(2)
+                
+    except FileNotFoundError:
+        print(f"The file {file_path} does not exist.")
+        time.sleep(2)
