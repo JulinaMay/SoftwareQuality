@@ -34,8 +34,8 @@ def main_menu():
         print("2. Login")
         print("3. Exit")
         
-        choice = input("Choose an option (1/2/3): ").strip()
-        # choice = "2"
+        # choice = input("Choose an option (1/2/3): ").strip()
+        choice = "2"
 
         if choice == "1":
             User.create_account("user")
@@ -63,8 +63,11 @@ def Login():
 
     while attempts < max_attempts:
         print("\n--- Login ---")
-        username = input("Enter your username: ")
-        password = getpass("Enter your password: ")
+        # username = input("Enter your username: ")
+        # password = getpass("Enter your password: ")
+
+        username = "super_admin"
+        password = "Admin_123?"
 
         user_data = []
         for user in data:

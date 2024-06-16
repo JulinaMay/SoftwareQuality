@@ -2,9 +2,6 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 
-# logging
-from Log_config import logger
-
 # Load the private key
 def private_key():
     with open('private_key.pem', 'rb') as key_file:

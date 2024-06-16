@@ -18,9 +18,11 @@ import bcrypt
 from Cryptography import *
 
 import time
+import datetime
 import random
 import zipfile
 import os
+import shutil
 
 # Hardcoded gegevens
 super_username="super_admin"
@@ -237,6 +239,7 @@ def system_menu():
         db_path = "MealManagement.db"
         backup_path = "backup/backup.sql"
         zip_path = "backup/backup.zip"
+        log_dir = "logs"
 
         print("\n--- System menu ---")
         print("1. Make a backup")
@@ -247,8 +250,9 @@ def system_menu():
         choice = input("Choose an option (1/2/3/4): ")
 
         if choice == "1":
-            make_backup(db_path, backup_path)
-            create_zip(backup_path, zip_path)
+            # make_backup(db_path, backup_path)
+            # create_zip(backup_path, zip_path)
+            create_zip(backup_path, log_dir, zip_path)
             print("Backup created")
             time.sleep(2)
         elif choice == "2":
@@ -624,7 +628,17 @@ def add_member():
         user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
         user = user_cursor.fetchone()
         if user is None:
-            print("User not found")
+            while True:
+                Main.clear()
+                print("User not found")
+                choice = input("Go back? (y/n)").strip().lower()
+                if choice == "y":
+                    return
+                elif choice == "n":
+                    break
+                else:
+                    print("Invalid input")
+                    continue
         else:
             user_found = True
     
@@ -768,7 +782,7 @@ def search_member():
             time.sleep(2)
     connection.close()
 
-def make_backup(db_path, backup_path):
+def make_backup(backup_path):
     connection = sqlite3.connect("MealManagement.db")
 
     with open(backup_path, 'w') as backup_file:
@@ -776,10 +790,45 @@ def make_backup(db_path, backup_path):
             backup_file.write('%s\n' % line)
 
     connection.close()
+    
+def collect_log_files(log_dir, temp_dir):
+    # Create a temporary directory if it doesn't exist
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+    
+    # Calculate 30 days ago from today
+    today = datetime.date.today()
+    thirty_days_ago = today - datetime.timedelta(days=30)
+    
+    # Iterate over log files and copy those modified in the last 30 days
+    for filename in os.listdir(log_dir):
+        filepath = os.path.join(log_dir, filename)
+        if os.path.isfile(filepath):
+            modified_time = datetime.date.fromtimestamp(os.path.getmtime(filepath))
+            if modified_time >= thirty_days_ago:
+                shutil.copy(filepath, temp_dir)
 
-def create_zip(backup_path, zip_path):
+def create_zip(backup_path, log_dir, zip_path):
+    temp_dir = 'temp_logs'
+    
+    # Make a backup of the database
+    make_backup(backup_path)
+    
+    # Collect log files modified in the last 30 days
+    collect_log_files(log_dir, temp_dir)
+    
+    # Create a ZIP file containing both the database backup and log files
     with zipfile.ZipFile(zip_path, 'w') as zipf:
-        zipf.write(backup_path), os.path.basename(backup_path)
+        # Add database backup
+        zipf.write(backup_path, os.path.basename(backup_path))
+        
+        # Add log files
+        for log_file in os.listdir(temp_dir):
+            log_file_path = os.path.join(temp_dir, log_file)
+            zipf.write(log_file_path, os.path.basename(log_file_path))
+
+    # Clean up temporary directory
+    shutil.rmtree(temp_dir)
 
 def restore_backup(db_path, zip_path):
     if not os.path.exists(zip_path):
@@ -838,7 +887,7 @@ def see_logs(date=None):
 
                 print(f"\n--- Page {page + 1} / {pages} ---\n")
                 for line in current_page_lines:
-                    print(line.rstrip())
+                    print(line.strip())
 
                 print("\n1. Next page")
                 print("2. Previous page")
