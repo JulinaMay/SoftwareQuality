@@ -1,6 +1,5 @@
 # Database
 import sqlite3
-import pandas as pd
 
 # Own modules
 import Main
@@ -98,22 +97,18 @@ def list_users():
     cursor = connection.cursor()
 
     # Get user data
-    cursor.execute("SELECT username, role_level FROM Users")
+    cursor.execute("SELECT id, username, role_level FROM Users")
     user_data = cursor.fetchall()
 
     # Decrypt data
     decrypted_user_data = []
-    for username, role in user_data:
+    for id, username, role in user_data:
         decrypted_username = decrypt_data(private_key(), username)
-        decrypted_user_data.append((decrypted_username, role))
-
-    df = pd.DataFrame(decrypted_user_data, columns=["Username", "Role"])
-    df.index += 1
-    df = df.rename_axis("ID")
+        decrypted_user_data.append((id, decrypted_username, role))
 
     page = 0
     rows_per_page = 10
-    total_pages = (len(df) + rows_per_page - 1) // rows_per_page
+    total_pages = (len(decrypted_user_data) + rows_per_page - 1) // rows_per_page
     while True:
         Main.clear()
         print("\n--- List of users ---")
@@ -122,7 +117,12 @@ def list_users():
         end_row = start_row + rows_per_page
         
         # print(df)
-        print(df.iloc[start_row:end_row])
+        print(f"{'ID':<5}{'Username':<25}{'Role':<10}")
+        print("-" * 40)
+
+        for id, username, role in decrypted_user_data[start_row:end_row]:
+            print(f"{id:<5}{username:<25}{role:<10}")
+
         print(f"\n--- page {page + 1} / {total_pages} ---")
         print("1. Next page")
         print("2. Previous page")
@@ -147,6 +147,7 @@ def list_users():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "List of users", "Invalid input in the list of users", "No")
             continue
     
     connection.close()
@@ -171,7 +172,7 @@ def consultant_menu():
             print("Make a new consultant")
             User.create_account("consultant")
             print("\nAdded a new consultant")
-            log_activity(super_username, "Add a consultant", "Added a new consultant", "No", "No")
+            log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
@@ -207,6 +208,7 @@ def systemadmin_menu():
             print("Make a new system admin")
             User.create_account("admin")
             print("\nAdded a new admin")
+            log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
@@ -224,6 +226,7 @@ def systemadmin_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "System", "Invalid input in the admin menu", "No")
             connection.close()
 
 # System menu
@@ -254,15 +257,18 @@ def system_menu():
             # create_zip(backup_path, zip_path)
             create_zip(backup_path, log_dir, zip_path)
             print("Backup created")
+            log_activity(super_username, "System", "Backup created", "No")
             time.sleep(2)
         elif choice == "2":
             Main.clear()
             print("Are you sure you want to restore the backup? This will delete all current data.")
-            choice = input("Choose an option (y/n): ").strip().lower()
-            if choice == "y":
+            choice = input("Choose an option (yes/no): ").strip().lower()
+            if choice == "y" or choice == "yes":
                 restore_backup(db_path, zip_path)
+                log_activity(super_username, "System", "Backup restored", "No")
             else:
                 print("Action cancelled")
+                log_activity(super_username, "System", "Backup restore cancelled", "No")
                 time.sleep(2)
         elif choice == "3":
             date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
@@ -272,6 +278,7 @@ def system_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "System", "Invalid input in the system menu", "No")
             time.sleep(2)
         connection.close()
 
@@ -298,7 +305,7 @@ def member_menu():
             modify_user("member")
         elif choice == "3":
             Main.clear()
-            delete_user("member")
+            update_role("member")
         elif choice == "4":
             Main.clear()
             search_member()
@@ -306,6 +313,7 @@ def member_menu():
             break
         else:
             print("Invalid input")
+            log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
 
 def update_role(role):
@@ -317,7 +325,7 @@ def update_role(role):
         id = input("Enter the id of the user to change their role: ").strip()
 
         choice = input("Go back? (yes/no)").strip().lower()
-        if choice == "y":
+        if choice == "y" or choice == "yes":
             break
         # Check if user exists in Users table
         user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
@@ -327,22 +335,23 @@ def update_role(role):
         elif role == "member":
             cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id))
             member = cursor.fetchall()
-            member = member[0]
-            sure = input(f"Are you sure you want to delete {member[2]} {member[3]} from member list? (y/n): ").strip().lower()
+            decrypt_member = decrypt_data(private_key(), member[0][2])
+            sure = input(f"Are you sure you want to delete {decrypt_member} from member list? (yes/no): ").strip().lower()
             if sure == "yes" or sure == "y":
                 Main.clear()
                 cursor.execute("DELETE FROM Members WHERE user_id = ?", (id))
-                cursor.execute("UPDATE Users SET role_level = 'user' WHERE user_id = ?", (id))
                 connection.commit()
-                print(f"{member[2]} {member[3]} deleted from member list")
+                print(f"{decrypt_member} deleted from member list")
+                log_activity(super_username, "Delete member", f"Deleted member: '{decrypt_member}'", "No")
                 time.sleep(2)
             elif sure == "n":
                 Main.clear()
                 print("No member deleted")
+                log_activity(super_username, "Delete member", "No member deleted", "No")
                 time.sleep(2)
             else:
                 Main.clear()
-                print("Invalid input")
+                log_activity(super_username, "Update role", "Invalid input in the member menu", "No")
                 time.sleep(2)
                 continue
         else:
@@ -352,6 +361,8 @@ def update_role(role):
             connection.commit()
             connection.close()  
             print("Changed succesfully")
+            decrypted_name = decrypt_data(private_key(), user[0][1])
+            log_activity(super_username, "Update role", f"Changed user: {decrypted_name} into {role}", "No")
             time.sleep(2)
         break
 
@@ -361,81 +372,89 @@ def modify_user(role):
     
     while True:
         print("\n--- Update user ---")
+        choice = input("Go back? (yes/no) ").strip().lower()
+        if choice == "yes" or choice == "y":
+            break
+    
         id_to_update = input("Enter the id of the user you want to update: ").strip()
         
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_update,))
         user = cursor.fetchall()
 
-        choice = input("Go back? (yes/no) ").strip().lower()
-        if choice == "yes" or choice == "y":
-            break
-
-        if user == []:
+        if not user:
             Main.clear()
             print("User not found")
             time.sleep(2)
             continue
+
+        decrypted_name = decrypt_data(private_key(), user[0][1])
+        
+        if role == "member":
+            print("""List of datatypes:
+                        first_name
+                        last_name
+                        age
+                        gender
+                        weight
+                        street
+                        house_number
+                        postal_code
+                        city
+                        country
+                        email
+                        phone_number
+                """)
         else:
             print("""List of fields:
-                     username
-                     first_name
-                     last_name
-                    """)
-            if role == "member":
-                print("""List of datatypes:
-                         first_name
-                         last_name
-                         age
-                         gender
-                         weight
-                         street
-                         house_number
-                         postal_code
-                         city
-                         country
-                         email
-                         phone_number
-                    """)
-            datatype_to_update = input("Enter the field you want to update: ").strip()
-
-            if datatype_to_update == "username":
-                loop = True
-                while loop:
-                    print(f"Username at the moment: {user[0][1]}")
-                    username = input("Enter username: ").strip()
-                    loop = validate_username(username)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE users SET username = ? WHERE id = ?", (username, id_to_update))
-                        connection.commit()
-                        print("Username updated successfully")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "first_name":
-                loop = True
-                while loop:
-                    first_name = input("Enter new first name: ").strip()
-                    loop = validate_first_name(first_name)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET first_name = ? WHERE id = ?", (first_name, id_to_update))
-                        connection.commit()
-                        print("First name updated successfully")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "last_name":
-                loop = True
-                while loop:
-                    last_name = input("Enter last name: ").strip()
-                    loop = validate_last_name(last_name)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET last_name = ? WHERE id = ?", (last_name, id_to_update))
-                        connection.commit()
-                        print("Last name updated successfully")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "age":
+                    username
+                    first_name
+                    last_name
+                """)
+        datatype_to_update = input("Enter the field you want to update: ").strip()
+        table_to_update = "Members" if role == "member" else "Users"
+        id_to_update    = "user_id" if role == "member" else "id"
+        if datatype_to_update == "username":
+            loop = True
+            while loop:
+                print(f"Username at the moment: {decrypted_name}")
+                username = input("Enter username: ").strip()
+                loop = validate_username(username)
+                # update member
+                if not loop:
+                    cursor.execute("UPDATE users SET username = ? WHERE id = ?", (username, id_to_update))
+                    connection.commit()
+                    print("Username updated successfully")
+                    log_activity(super_username, "Update user", f"Updated username of user with username: {decrypted_name}", "No")
+                    time.sleep(2)
+                    break
+        elif datatype_to_update == "first_name":
+            loop = True
+            while loop:
+                first_name = input("Enter new first name: ").strip()
+                loop = validate_first_name(first_name)
+                # update member
+                if not loop:
+                    cursor.execute(f"UPDATE {table_to_update} SET first_name = ? WHERE {id_to_update} = ?", (first_name, id_to_update))
+                    connection.commit()
+                    print("First name updated successfully")
+                    log_activity(super_username, "Updated user", f"Updated first name of user with username: {decrypted_name}", "No")
+                    time.sleep(2)
+                    break
+        elif datatype_to_update == "last_name":
+            loop = True
+            while loop:
+                last_name = input("Enter last name: ").strip()
+                loop = validate_last_name(last_name)
+                # update member
+                if not loop:
+                    cursor.execute(f"UPDATE {table_to_update} SET last_name = ? WHERE {id_to_update} = ?", (last_name, id_to_update))
+                    connection.commit()
+                    print("Last name updated successfully")
+                    log_activity(super_username, "Update user", f"Updated last name of user with username: {decrypted_name}", "No")
+                    time.sleep(2)
+                    break
+        if role == "member":
+            if datatype_to_update == "age":
                     loop = True
                     while loop:
                         age = input("Enter age: ").strip()
@@ -445,9 +464,10 @@ def modify_user(role):
                             cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
                             connection.commit()
                             print("Age updated successfully")
+                            log_activity(super_username, "Update user", f"Updated age of user with username: {decrypted_name}", "No")
                             time.sleep(2)
                             break
-            elif role == "member" and datatype_to_update == "gender":
+            elif datatype_to_update == "gender":
                 loop = True
                 while loop:
                     gender = input("Enter gender: ").strip().capitalize()
@@ -457,9 +477,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET gender = ? WHERE user_id = ?", (gender, id_to_update))
                         connection.commit()
                         print("Gender updated successfully")
+                        log_activity(super_username, "Update user", f"Updated gender of usre with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "weight":
+            elif datatype_to_update == "weight":
                 loop = True
                 while loop:
                     weight = input("Enter weight: ").strip()
@@ -469,9 +490,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET weight = ? WHERE user_id = ?", (weight, id_to_update))
                         connection.commit()
                         print("Weight updated successfully")
+                        log_activity(super_username, "Update user", f"Updated weight of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "street":
+            elif datatype_to_update == "street":
                 loop = True
                 while loop:
                     street = input("Enter street: ").strip().title()
@@ -481,9 +503,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET street = ? WHERE user_id = ?", (street, id_to_update))
                         connection.commit()
                         print("Street updated successfully")
+                        log_activity(super_username, "Update user", f"Updated street of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "house_number":
+            elif datatype_to_update == "house_number":
                 loop = True
                 while loop:
                     house_number = input("Enter house number: ").strip()
@@ -493,9 +516,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET house_number = ? WHERE user_id = ?", (house_number, id_to_update))
                         connection.commit()
                         print("House number updated successfully")
+                        log_activity(super_username, "Update user", f"Updated house number of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "postal_code":
+            elif datatype_to_update == "postal_code":
                 loop = True
                 while loop:
                     postal_code = input("Enter postal code: ").strip()
@@ -505,9 +529,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET postal_code = ? WHERE user_id = ?", (postal_code, id_to_update))
                         connection.commit()
                         print("Postal code updated successfully")
+                        log_activity(super_username, "Update user", f"Updated postal code of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "city":
+            elif datatype_to_update == "city":
                 loop = True
                 while loop:
                     city = input("Enter city: ").strip().capitalize()
@@ -517,9 +542,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET city = ? WHERE user_id = ?", (city, id_to_update))
                         connection.commit()
                         print("City updated successfully")
+                        log_activity(super_username, "Update user", f"Updated city of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "country":
+            elif datatype_to_update == "country":
                 loop = True
                 while loop:
                     country = input("Enter country: ").strip().capitalize()
@@ -529,9 +555,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET country = ? WHERE user_id = ?", (country, id_to_update))
                         connection.commit()
                         print("Country updated successfully")
+                        log_activity(super_username, "Update user", f"Updated country of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "email":
+            elif datatype_to_update == "email":
                 loop = True
                 while loop:
                     email = input("Enter email: ").strip().lower()
@@ -541,9 +568,10 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET email = ? WHERE user_id = ?", (email, id_to_update))
                         connection.commit()
                         print("Email updated successfully")
+                        log_activity(super_username, "Update user", f"Updated email of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
-            elif role == "member" and datatype_to_update == "phone_number":
+            elif datatype_to_update == "phone_number":
                 loop = True
                 while loop:
                     phone_number = input("Enter phone number: ").strip()
@@ -553,11 +581,13 @@ def modify_user(role):
                         cursor.execute("UPDATE Members SET phone_number = ? WHERE user_id = ?", (phone_number, id_to_update))
                         connection.commit()
                         print("Phone number updated successfully")
+                        log_activity(super_username, "Update user", f"Updated phone number of user with username: {decrypted_name}", "No")
                         time.sleep(2)
                         break
             else:
                 Main.clear()
                 print("Invalid input")
+                log_activity(super_username, "Update user", "Invalid input in modify menu", "No")
                 time.sleep(2)
                 continue
 
@@ -566,15 +596,15 @@ def delete_user(role):
     cursor = connection.cursor()
 
     while True:
-        print("\n--- Delete {role} ---")
-        id_to_delete = input("Enter the id of the {role} you want to delete: ").strip()
-        
-        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
-        user = cursor.fetchall()
-
+        print(f"\n--- Delete {role} ---")
         choice = input("Go back? (yes/no) ").strip().lower()
         if choice == "yes" or choice == "y":
             break
+        id_to_delete = input(f"Enter the id of the {role} you want to delete: ").strip()
+        
+        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
+        user = cursor.fetchall()
+        decrypted_name = decrypt_data(private_key(), user[0][1])
 
         if user == []:
             Main.clear()
@@ -584,23 +614,24 @@ def delete_user(role):
         else:
             cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
             connection.commit()
-            print("Consultant deleted successfully")
+            print(f"{role} deleted successfully")
+            log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
             time.sleep(2)
 
 def reset_pw(role):
     Main.clear()
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
+    decrypted_name = decrypt_data(private_key(), user[0][1])
     while True:
-        print("\n--- Reset password of {role} ---")
-        pw_to_delete = input("Enter the id of the {role} for the password you want to delete: ").strip()
-
-        cursor.execute("SELECT password FROM Users WHERE id = ?", (pw_to_delete,))
-        user = cursor.fetchall()
-
+        print(f"\n--- Reset password of {role} ---")
         choice = input("Go back? (yes/no) ").strip().lower()
         if choice == "yes" or choice == "y":
             break
+        pw_to_delete = input(f"Enter the id of the {role} for the password you want to delete: ").strip()
+
+        cursor.execute("SELECT password FROM Users WHERE id = ?", (pw_to_delete,))
+        user = cursor.fetchall()
 
         if user == []:
             Main.clear()
@@ -611,6 +642,7 @@ def reset_pw(role):
             cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), pw_to_delete))
             connection.commit()
             print("Password reset successfully")
+            log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
 
 def add_member():
@@ -713,6 +745,7 @@ def add_member():
 
     Main.clear()
     print("Member request processed successfully")
+    log_activity(super_username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
     time.sleep(2)
 
     return (first_name, last_name)
@@ -779,6 +812,7 @@ def search_member():
         else:
             Main.clear()
             print("Invalid input")
+            log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
             time.sleep(2)
     connection.close()
 
