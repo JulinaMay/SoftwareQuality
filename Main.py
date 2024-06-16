@@ -72,7 +72,7 @@ def Login():
         if decrypted_username == username:
             user_data = user
             break
-    
+
     # Login validation
     if user_data:
         username   = decrypt_data(private_key(), user_data[0])

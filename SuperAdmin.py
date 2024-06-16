@@ -196,9 +196,11 @@ def system_menu():
     cursor = connection.cursor()
     while True:
         Main.clear()
+        if not os.path.exists('backup'):
+            os.makedirs('backup')
         db_path = "MealManagement.db"
-        backup_path = "backup.sql"
-        zip_path = "backup.zip"
+        backup_path = "backup/backup.sql"
+        zip_path = "backup/backup.zip"
         print("\n--- System menu ---")
         print("1. Make a backup")
         print("2. Restore backup")
