@@ -772,3 +772,7 @@ def restore_backup(db_path, zip_path):
 
         print("Backup restored")
         time.sleep(2)
+
+def see_logs():
+    
+    return
