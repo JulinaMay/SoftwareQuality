@@ -31,4 +31,8 @@ def log_activity(username, description, additional_info=None, suspicious='No'):
         log_entry = f"{username} - {description} - {additional_info} - Suspicious: {suspicious}"
     else:
         log_entry = f"{username} {description} Suspicious: {suspicious}"
-    logger.info(log_entry)
+
+    if suspicious == 'Yes':
+        logger.warning(log_entry)
+    else:
+        logger.info(log_entry)

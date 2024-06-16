@@ -23,7 +23,6 @@ import time
 def main():
     Database.create_or_connect_db()
     log_activity("System", "Program started", "No", "No") 
-    logger.info("Program started")
     main_menu()
     
 def main_menu():
