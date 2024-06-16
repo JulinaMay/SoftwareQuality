@@ -4,14 +4,14 @@ import bcrypt
 from getpass import getpass
 from Cryptography import *
 
-import Main
+import um_members
 
 # logging
 from Log_config import *
 
 def create_account(role):
     while True:
-        Main.clear()
+        um_members.clear()
         print("\n--- Create Account ---")
         userName = input("Enter a username: ")
 
