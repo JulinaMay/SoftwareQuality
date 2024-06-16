@@ -196,11 +196,14 @@ def system_menu():
     cursor = connection.cursor()
     while True:
         Main.clear()
+
+        # Backup and restore
         if not os.path.exists('backup'):
             os.makedirs('backup')
         db_path = "MealManagement.db"
         backup_path = "backup/backup.sql"
         zip_path = "backup/backup.zip"
+
         print("\n--- System menu ---")
         print("1. Make a backup")
         print("2. Restore backup")
@@ -215,7 +218,14 @@ def system_menu():
             print("Backup created")
             time.sleep(2)
         if choice == "2":
-            restore_backup(db_path, zip_path)
+            Main.clear()
+            print("Are you sure you want to restore the backup? This will delete all current data.")
+            choice = input("Choose an option (y/n): ").strip().lower()
+            if choice == "y":
+                restore_backup(db_path, zip_path)
+            else:
+                print("Action cancelled")
+                time.sleep(2)
 # Member menu
 def member_menu():
     connection = sqlite3.connect("MealManagement.db")
@@ -727,4 +737,38 @@ def create_zip(backup_path, zip_path):
         zipf.write(backup_path), os.path.basename(backup_path)
 
 def restore_backup(db_path, zip_path):
-    return
+    if not os.path.exists(zip_path):
+        print("No backup found")
+        time.sleep(2)
+        return
+    else:
+        # Connect to the database
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+
+        # Clear the database
+        Database.clear_database()
+
+        # Extract the backup zip file
+        with zipfile.ZipFile(zip_path, 'r') as zipf:
+            zipf.extractall('backup')
+
+        # Determine the backup file path
+        backup_file_path = os.path.join('backup', 'backup.sql')
+
+        # Read and execute the SQL dump file
+        with open(backup_file_path, 'r') as backup_file:
+            sql_script = backup_file.read()
+            cursor.executescript(sql_script)
+
+        connection.commit()
+        connection.close()
+
+        # Cleanup: remove the extracted backup file and directory
+        if os.path.exists('backup'):
+            for file in os.listdir('backup'):
+                os.remove(os.path.join('backup', file))
+            os.rmdir('backup')
+
+        print("Backup restored")
+        time.sleep(2)
