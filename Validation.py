@@ -37,51 +37,80 @@ def validate_last_name(last_name):
 
 
 def validate_age(age):
-    integer = False
+    isInteger = False
     inRange = False
     
     try:
         age = int(age)
-        integer = True
+        isInteger = True
         if 0 <= age <= 120:
             inRange = True
     except ValueError:
         pass
 
-    if integer and inRange:
+    if isInteger and inRange:
         return True
     return False
 
 
 def validate_gender(gender):
-    if gender not in database.Genders:
+    genderExists = False
+
+    if gender in database.Genders:
+        genderExists = True
+
+    if genderExists:
         return True
     return False
 
 
 def validate_weight(weight):
+    isFloat = False
+    inRange = False
+
+
     try:
         weight = float(weight)
+        isFloat = True
+        if 0 <= weight <= 300:
+            inRange = True
     except ValueError:
-        return True
-    if weight < 0 or weight > 300:
+        pass
+    
+    if isFloat and inRange:
         return True
     return False
 
 
 def validate_street(street):
     pattern = r"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$" # A-Z, a-z, -, spaties
-    if len(street) > 30 or not re.match(pattern, street):
+    length = False
+    syntax = False  
+
+    if len(street) < 50:
+        length = True
+    if re.match(pattern, street):
+        syntax = True
+
+    if length and syntax:
         return True
     return False
 
 
+
 def validate_house_number(house_number):
+    isInteger = False   
+    inRange = False
+
     try:
         house_number = int(house_number)
+        isInteger = True
+        if 0 <= house_number <= 10000:
+            inRange = True
     except ValueError:
         return True
-    if house_number < 0 or house_number > 10000:
+    
+    if isInteger and inRange:
         return True
     return False
 
