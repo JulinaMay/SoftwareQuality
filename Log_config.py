@@ -2,7 +2,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 from datetime import datetime
-from Cryptography import *
+from cryptography import *
 
 # Ensure the directory exists
 if not os.path.exists('logs'):

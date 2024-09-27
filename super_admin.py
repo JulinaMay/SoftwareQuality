@@ -2,19 +2,18 @@
 import sqlite3
 
 # Own modules
-import um_members
-import User
-import Member
-
+import member_menu
+import member
+import user
 # Validation
-from Validation import *
+from validation import *
 
 # Logging
-from Log_config import *
+from log_config import *
 
 # cryptography and hashing
 import bcrypt
-from Cryptography import *
+from cryptography import *
 
 import time
 import datetime
@@ -32,12 +31,12 @@ def menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    um_members.clear()
+    member_menu.clear()
     print(f"Welcome super admin!")
     print("\n--- Super Admin Menu ---")
     #List van users
     while True:
-        um_members.clear()
+        member_menu.clear()
     #List van users
         print("1. List of users")
 
@@ -67,19 +66,19 @@ def menu():
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
         if choice == "1":
-            um_members.clear()
+            member_menu.clear()
             list_users()
         elif choice == "2":
-            um_members.clear()
+            member_menu.clear()
             consultant_menu()
         elif choice == "3":
-            um_members.clear()
+            member_menu.clear()
             systemadmin_menu()
         elif choice == "4":
-            um_members.clear()
+            member_menu.clear()
             system_menu()
         elif choice == "5":
-            um_members.clear()
+            member_menu.clear()
             member_menu()
         elif choice == "6":
             print("Exiting the program. Goodbye!")
@@ -110,7 +109,7 @@ def list_users():
     rows_per_page = 10
     total_pages = (len(decrypted_user_data) + rows_per_page - 1) // rows_per_page
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- List of users ---")
 
         start_row = page * rows_per_page
@@ -143,7 +142,7 @@ def list_users():
             else:
                 page -= 1
         elif choice == "3":
-            um_members.clear()
+            member_menu.clear()
             break
         else:
             print("Invalid input")
@@ -157,7 +156,7 @@ def consultant_menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- Consultant menu ---")
         print("1. Make a new consultant")
         print("2. Make an user a consultant")
@@ -170,20 +169,20 @@ def consultant_menu():
         
         if choice == "1":
             print("Make a new consultant")
-            User.create_account("consultant")
+            user.create_account("consultant")
             print("\nAdded a new consultant")
             log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
             time.sleep(2)
         elif choice == "2":
-            um_members.clear()
+            member_menu.clear()
             update_role("consultant")
         elif choice == "3":
-            um_members.clear()
+            member_menu.clear()
             modify_user("consultant")
         elif choice == "4":
             delete_user("consultant")
         elif choice == "5":
-            um_members.clear()
+            member_menu.clear()
             reset_pw("consultant")
         elif choice == "6":
             break
@@ -193,7 +192,7 @@ def systemadmin_menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- System admin menu ---")
         print("1. Make a new system admin")
         print("2. Make an user an admin")
@@ -206,21 +205,21 @@ def systemadmin_menu():
 
         if choice == "1":
             print("Make a new system admin")
-            User.create_account("admin")
+            user.create_account("admin")
             print("\nAdded a new admin")
             log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
             time.sleep(2)
         elif choice == "2":
-            um_members.clear()
+            member_menu.clear()
             update_role("admin")
         elif choice == "3":
-            um_members.clear()
+            member_menu.clear()
             modify_user("admin")
         elif choice == "4":
-            um_members.clear()
+            member_menu.clear()
             delete_user("admin")
         elif choice == "5":
-            um_members.clear()
+            member_menu.clear()
             reset_pw("admin")
         elif choice == "6":
             break
@@ -234,7 +233,7 @@ def system_menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
     while True:
-        um_members.clear()
+        member_menu.clear()
 
         # Backup and restore
         if not os.path.exists('backup'):
@@ -260,7 +259,7 @@ def system_menu():
             log_activity(super_username, "System", "Backup created", "No")
             time.sleep(2)
         elif choice == "2":
-            um_members.clear()
+            member_menu.clear()
             print("Are you sure you want to restore the backup? This will delete all current data.")
             choice = input("Choose an option (yes/no): ").strip().lower()
             if choice == "y" or choice == "yes":
@@ -272,7 +271,7 @@ def system_menu():
                 time.sleep(2)
         elif choice == "3":
             date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
-            um_members.clear()
+            member_menu.clear()
             see_logs(date)
         elif choice == "4":
             break
@@ -287,7 +286,7 @@ def member_menu():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- System admin menu ---")
         print("1. Make a member")
         print("2. Modify a member")
@@ -298,16 +297,16 @@ def member_menu():
         choice = input("Choose an option (1/2/3/4/5): ")
 
         if choice == "1":
-            um_members.clear()
+            member_menu.clear()
             add_member()
         elif choice == "2":
-            um_members.clear()
+            member_menu.clear()
             modify_user("member")
         elif choice == "3":
-            um_members.clear()
+            member_menu.clear()
             update_role("member")
         elif choice == "4":
-            um_members.clear()
+            member_menu.clear()
             search_member()
         elif choice == "5":
             break
@@ -338,19 +337,19 @@ def update_role(role):
             decrypt_member = decrypt_data(private_key(), member[0][2])
             sure = input(f"Are you sure you want to delete {decrypt_member} from member list? (yes/no): ").strip().lower()
             if sure == "yes" or sure == "y":
-                um_members.clear()
+                member_menu.clear()
                 cursor.execute("DELETE FROM Members WHERE user_id = ?", (id))
                 connection.commit()
                 print(f"{decrypt_member} deleted from member list")
                 log_activity(super_username, "Delete member", f"Deleted member: '{decrypt_member}'", "No")
                 time.sleep(2)
             elif sure == "n":
-                um_members.clear()
+                member_menu.clear()
                 print("No member deleted")
                 log_activity(super_username, "Delete member", "No member deleted", "No")
                 time.sleep(2)
             else:
-                um_members.clear()
+                member_menu.clear()
                 log_activity(super_username, "Update role", "Invalid input in the member menu", "No")
                 time.sleep(2)
                 continue
@@ -382,7 +381,7 @@ def modify_user(role):
         user = cursor.fetchall()
 
         if not user:
-            um_members.clear()
+            member_menu.clear()
             print("User not found")
             time.sleep(2)
             continue
@@ -585,7 +584,7 @@ def modify_user(role):
                         time.sleep(2)
                         break
             else:
-                um_members.clear()
+                member_menu.clear()
                 print("Invalid input")
                 log_activity(super_username, "Update user", "Invalid input in modify menu", "No")
                 time.sleep(2)
@@ -607,7 +606,7 @@ def delete_user(role):
         decrypted_name = decrypt_data(private_key(), user[0][1])
 
         if user == []:
-            um_members.clear()
+            member_menu.clear()
             print("User not found")
             time.sleep(2)
             continue
@@ -619,7 +618,7 @@ def delete_user(role):
             time.sleep(2)
 
 def reset_pw(role):
-    um_members.clear()
+    member_menu.clear()
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
     decrypted_name = decrypt_data(private_key(), user[0][1])
@@ -634,7 +633,7 @@ def reset_pw(role):
         user = cursor.fetchall()
 
         if user == []:
-            um_members.clear()
+            member_menu.clear()
             print("User not found")
             time.sleep(2)
             continue
@@ -661,7 +660,7 @@ def add_member():
         user = user_cursor.fetchone()
         if user is None:
             while True:
-                um_members.clear()
+                member_menu.clear()
                 print("User not found")
                 choice = input("Go back? (y/n)").strip().lower()
                 if choice == "y":
@@ -685,21 +684,21 @@ def add_member():
     first_name = decrypt_data(private_key(), user[3])
     last_name = decrypt_data(private_key(), user[4])
 
-    um_members.clear()
+    member_menu.clear()
     print("\n--- Process member Request ---")
     print(f"User: {first_name} {last_name}\n")
 
     # Input and validation
-    age = input_and_validate("Enter age: ", validate_age, "18")
-    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender, "Neither")
-    weight = input_and_validate("Enter weight (kg): ", validate_weight, "0")
-    street = input_and_validate("Enter street: ", validate_street, "Unknown")
-    house_number = input_and_validate("Enter house number: ", validate_house_number, "0")
-    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1111AA")
-    city = input_and_validate("Enter city: ", validate_city, "Groningen")
-    country = input_and_validate("Enter country: ", validate_country, "Netherlands")
-    email = input_and_validate("Enter email: ", validate_email, "test@test.com")
-    phone_number = input_and_validate("Enter phone number: ", validate_phone_number, "+612345678")
+    age = input_and_validate("Enter age: ", validate_age)
+    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender)
+    weight = input_and_validate("Enter weight (kg): ", validate_weight)
+    street = input_and_validate("Enter street: ", validate_street)
+    house_number = input_and_validate("Enter house number: ", validate_house_number)
+    postal_code = input_and_validate("Enter postal code: ", validate_postal_code)
+    city = input_and_validate("Enter city: ", validate_city)
+    country = input_and_validate("Enter country: ", validate_country)
+    email = input_and_validate("Enter email: ", validate_email)
+    phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
     
     #  Create unique member_id
     user_registration_year = user[5].split("-")[0]
@@ -743,7 +742,7 @@ def add_member():
     connection.commit()
     connection.close()
 
-    um_members.clear()
+    member_menu.clear()
     print("Member request processed successfully")
     log_activity(super_username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
     time.sleep(2)
@@ -761,9 +760,9 @@ def search_member():
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
 
-    um_members.clear()
+    member_menu.clear()
     print("\n--- Retrieve Member Data ---")
-    um_members.clear()
+    member_menu.clear()
     print("\n--- Retrieve member ---")
     search = input("Search: ").strip()
     search = f"%{search}%"
@@ -773,7 +772,7 @@ def search_member():
     
     # Check if any members are found
     if members == []:
-        um_members.clear()
+        member_menu.clear()
         print("No members found")
         time.sleep(2)
         return
@@ -781,11 +780,11 @@ def search_member():
     current_member = 0
     # Show user data
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- Member Data ---")
         
         # Show member data
-        Member.ShowData(members[current_member])
+        member.ShowData(members[current_member])
         
         # Show page number and menu
         print("\n--- page", current_member + 1, "/", len(members), "---")
@@ -795,14 +794,14 @@ def search_member():
         choice = input("Choose an option (1/2/3): ").strip()
         if choice == "1":
             if current_member == len(members) - 1:
-                um_members.clear()
+                member_menu.clear()
                 print("You have reached the last page")
                 time.sleep(2)
             else:
                 current_member += 1
         elif choice == "2":
             if current_member == 0:
-                um_members.clear()
+                member_menu.clear()
                 print("You are already at the first page")
                 time.sleep(2)
             else:
@@ -810,7 +809,7 @@ def search_member():
         elif choice == "3":
             break
         else:
-            um_members.clear()
+            member_menu.clear()
             print("Invalid input")
             log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
             time.sleep(2)
@@ -875,7 +874,7 @@ def restore_backup(db_path, zip_path):
         cursor = connection.cursor()
 
         # Clear the database
-        Database.clear_database()
+        database.clear_database()
 
         # Extract the backup zip file
         with zipfile.ZipFile(zip_path, 'r') as zipf:
@@ -914,7 +913,7 @@ def see_logs(date=None):
 
             page = 0
             while True:
-                um_members.clear()
+                member_menu.clear()
                 start_index = page * 20
                 end_index = min((page + 1) * 20, total_lines)
                 current_page_lines = lines[start_index:end_index]

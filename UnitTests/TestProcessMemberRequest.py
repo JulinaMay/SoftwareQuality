@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import Consultant
+import consultant
 
 class TestProcessMemberRequest(unittest.TestCase):
 
@@ -42,7 +42,7 @@ class TestProcessMemberRequest(unittest.TestCase):
         mock_cursor.fetchone.side_effect = fetchone_side_effect
         mock_cursor.execute.return_value = mock_cursor  # Execute should return the mock cursor itself
         
-        Consultant.process_member_request()
+        consultant.process_member_request()
 
         # Asserting that appropriate SQL queries were executed
         self.assertTrue(mock_cursor.execute.called)

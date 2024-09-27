@@ -2,16 +2,16 @@ import sqlite3
 
 import bcrypt
 from getpass import getpass
-from Cryptography import *
+from cryptography import *
 
-import um_members
+import member_menu
 
 # logging
-from Log_config import *
+from log_config import *
 
 def create_account(role):
     while True:
-        um_members.clear()
+        member_menu.clear()
         print("\n--- Create Account ---")
         userName = input("Enter a username: ")
 

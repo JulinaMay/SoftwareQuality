@@ -1,7 +1,7 @@
 import sqlite3
 
 # logging
-from Log_config import logger
+from log_config import logger
 
 Roles = ('admin', 'consultant', 'member', 'user')
 Genders = ('Male', 'Female', 'Neither')

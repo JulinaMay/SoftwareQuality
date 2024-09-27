@@ -1,8 +1,8 @@
 import re
-import Database
+import database
 
 # logging
-from Log_config import logger
+from log_config import logger
 
 # VALIDATION
 
@@ -36,7 +36,7 @@ def validate_age(age):
     return False
 
 def validate_gender(gender):
-    if gender not in Database.Genders:
+    if gender not in database.Genders:
         print("Invalid Gender")
         logger.warning("User entered an invalid gender")
         return True
@@ -85,7 +85,7 @@ def validate_postal_code(postal_code):
     return False
 
 def validate_city(city):
-    if city not in Database.Cities:
+    if city not in database.Cities:
         print("Invalid city")
         logger.warning("User entered an invalid city")
         return True

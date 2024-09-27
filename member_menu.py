@@ -1,27 +1,27 @@
 # Accountlevels
-import User
-import Consultant
-import Admin
-from SuperAdmin import super_username, super_password
-import SuperAdmin
+import user
+import consultant
+import admin
+from super_admin import super_username, super_password
+import super_admin
 
 # database
 import sqlite3
-import Database
+import database
 
 # cryptography and hashing
 import bcrypt
 from getpass import getpass
-from Cryptography import *
+from cryptography import *
 
 # logging
-from Log_config import *
+from log_config import *
 
 from os import system, name
 import time
 
 def main():
-    Database.create_or_connect_db()
+    database.create_or_connect_db()
     log_activity("System", "Program started", "No", "No") 
     main_menu()
     
@@ -30,17 +30,14 @@ def main_menu():
         clear()
         # Voor als je nog niet hebt ingelogd?
         print("\n--- Main Menu ---")
-        print("1. Create account")
-        print("2. Login")
-        print("3. Exit")
+        print("1. Login")
+        print("2. Exit")
         
-        choice = input("Choose an option (1/2/3): ").strip()
+        choice = input("Choose an option (1/2): ").strip()
 
         if choice == "1":
-            User.create_account("user")
-        elif choice == "2":
             Login()
-        elif choice == "3":
+        elif choice == "2":
             print("Exiting the program. Goodbye!")
             log_activity("System", "Program exited", "No", "No")
             break
@@ -87,7 +84,7 @@ def Login():
                     log_activity(decrypted_username, "Attempted login", f"{role_name} {first_name} {last_name} is not allowed to login", "No")
                 elif role_level == "consultant":
                     log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
-                    Consultant.menu(decrypted_username)
+                    consultant.menu(decrypted_username)
                 elif role_level == "admin":
                     log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
                     Admin.menu(decrypted_username)
@@ -102,7 +99,7 @@ def Login():
                     log_activity(decrypted_username, "Login failed", "Entered invalid password", "No")
         elif username == super_username and password == super_password:
             log_activity(super_username, "Login successful", "Super admin logged in", "No")
-            SuperAdmin.menu()
+            super_admin.menu()
             break
         else:
             attempts += 1

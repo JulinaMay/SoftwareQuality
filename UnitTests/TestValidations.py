@@ -4,7 +4,7 @@ from unittest.mock import patch
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Consultant import (
+from consultant import (
     validate_first_name, validate_last_name, validate_age, validate_gender, 
     validate_weight, validate_street, validate_house_number, validate_postal_code, 
     validate_city, validate_country, validate_email, validate_phone_number
