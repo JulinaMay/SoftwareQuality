@@ -1,4 +1,4 @@
-from cryptography import (decrypt_data, private_key)
+from safe_data import (decrypt_data, private_key)
 # logging
 from log_config import logger
 

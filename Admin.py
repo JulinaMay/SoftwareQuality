@@ -6,7 +6,7 @@ import bcrypt
 
 import time
 
-import member_menu
+import main
 from super_admin import *
 
 # logging
@@ -48,21 +48,21 @@ def menu(username):
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
         if choice == "1":
-            member_menu.clear()
+            main.clear()
             update_password(username)
         elif choice == "2":
-            member_menu.clear()
+            main.clear()
             list_users()
         elif choice == "3":
-            member_menu.clear()
+            main.clear()
             consultant_menu()
         elif choice == "4":
             system_menu()
         elif choice == "5":
-            member_menu.clear()    
-            member_menu()
+            main.clear()    
+            Main()
         else:
-            member_menu.clear()
+            main.clear()
             log_activity(username, "System", "Invalid input at the modifying menu", "No")
             time.sleep(2)
 
@@ -70,7 +70,7 @@ def menu(username):
 def update_password(username):
     connection = sqlite3.connect("MealManagement.db")
     cursor = connection.cursor()
-    member_menu.clear()
+    main.clear()
     print("\n--- Update Password ---")
 
     # Login with current password
@@ -85,17 +85,17 @@ def update_password(username):
         return False
     else:
         while True:
-            member_menu.clear()
+            main.clear()
             print("\n--- Update Password ---")
             new_password = getpass("Enter your new password: ")
             if (new_password == ""):
-                member_menu.clear()
+                main.clear()
                 print("Password can't be empty")
                 log_activity(username, "Update password" "Entered nothing", "No")
                 time.sleep(2)
                 continue
             elif (new_password == input_password):
-                member_menu.clear()
+                main.clear()
                 print("New password can't be the same as the old password")
                 log_activity(username, "Update password" "Entered same password as the old password", "No")
                 time.sleep(2)
@@ -105,7 +105,7 @@ def update_password(username):
                 cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
                 connection.commit()
                 connection.close()
-                member_menu.clear()
+                main.clear()
                 print("Password updated successfully")
                 log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
                 time.sleep(2)

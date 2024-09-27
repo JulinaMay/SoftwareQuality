@@ -1,5 +1,4 @@
 # Accountlevels
-import user
 import consultant
 import admin
 from super_admin import super_username, super_password
@@ -12,7 +11,7 @@ import database
 # cryptography and hashing
 import bcrypt
 from getpass import getpass
-from cryptography import *
+from safe_data import *
 
 # logging
 from log_config import *
@@ -87,7 +86,7 @@ def Login():
                     consultant.menu(decrypted_username)
                 elif role_level == "admin":
                     log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
-                    Admin.menu(decrypted_username)
+                    admin.menu(decrypted_username)
                 break  # Exit the loop after a successful login
             else:
                 attempts += 1
