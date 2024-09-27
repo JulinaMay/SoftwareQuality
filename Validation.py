@@ -117,47 +117,88 @@ def validate_house_number(house_number):
 
 def validate_postal_code(postal_code):
     pattern = r"^[1-9][0-9]{3}[A-Z]{2}$" # 4 cijfers, 2 hoofdletters
-    if not re.match(pattern, postal_code):
+    syntax = False
+
+    if re.match(pattern, postal_code):
+        syntax = True
+
+    if syntax:
         return True
     return False
 
 
 def validate_city(city):
-    if city not in database.Cities:
+    cityExists = False
+
+    if city in database.Cities:
+        cityExists = True
+
+    if cityExists:
         return True
     return False
 
 
 def validate_country(country):
     pattern = r"^[A-Z][a-zA-Z]+$" # First letter capital, rest normal
-    if len(country) > 30 or not re.match(pattern, country):
+    length = False
+    syntax = False
+
+    if len(country) < 30:
+        length = True
+    if re.match(pattern, country):
+        syntax = True
+
+    if length and syntax:
         return True
     return False
 
 
 def validate_email(email):
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" # email regex
-    if len(email) > 50 or not re.match(pattern, email):
+    length = False
+    syntax = False
+
+    if len(email) < 50:
+        length = True
+    if re.match(pattern, email):
+        syntax = True
+
+    if length and syntax:
         return True
     return False
 
 
 def validate_phone_number(phone_number):
     pattern = r"^\+(?:[0-9] ?){6,14}[0-9]$" # telefoonnummer regex
-    if not re.match(pattern, phone_number):
+    syntax = False
+
+    if re.match(pattern, phone_number):
+        syntax = True
+
+    if syntax:
         return True
     return False
 
 
 def validate_username(username):
     pattern = r"^[a-zA-Z0-9]+$" # A-Z, a-z, 0-9
-    if len(username) > 15 or not re.match(pattern, username):
+    syntax = False
+
+    if re.match(pattern, username):
+        syntax = True
+
+    if syntax:
         return True
     return False
 
 
 def validate_password(password):
     pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$" # 1 hoofdletter, 1 kleine letter, 1 cijfer, 8 karakters
-    if not re.match(pattern, password):
+    syntax = False
+
+    if re.match(pattern, password):
+        syntax = True
+
+    if syntax:
         return True
     return False
