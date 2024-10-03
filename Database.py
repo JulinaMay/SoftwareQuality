@@ -1,6 +1,6 @@
 import sqlite3
 
-# logging
+# logging.
 from log_config import logger
 
 Roles = ('admin', 'consultant', 'member', 'user')

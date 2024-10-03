@@ -1,4 +1,4 @@
-# System admin
+# System admin.
 import sqlite3
 
 from getpass import getpass

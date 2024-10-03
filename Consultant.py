@@ -12,7 +12,7 @@ from super_admin import *
 # logging
 from log_config import *
 
-# MENU
+# MENU.
 
 def menu(username):
     connection = sqlite3.connect("mealmanagement.db")

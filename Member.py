@@ -1,5 +1,5 @@
 from safe_data import (decrypt_data, private_key)
-# logging
+# logging.
 from log_config import logger
 
 def ShowData(member):

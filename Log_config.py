@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from cryptography import *
 
-# Ensure the directory exists
+# Ensure the directory exists.
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
