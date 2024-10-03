@@ -8,7 +8,7 @@ Genders = ('Male', 'Female', 'Neither')
 Cities = ('Papendrecht', 'Delft', 'Rotterdam', 'Den Haag', 'Schiedam', 'Zwolle', 'Leiden', 'Groningen', 'Maastricht', 'Urk')
 
 def create_or_connect_db():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
 
     cursor = connection.cursor()
 
@@ -49,7 +49,7 @@ def create_or_connect_db():
     connection.close()
 
 def clear_database():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS Users")

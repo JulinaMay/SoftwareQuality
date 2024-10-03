@@ -2,20 +2,20 @@ import sqlite3
 
 import bcrypt
 from getpass import getpass
-from cryptography import *
+from safe_data import *
 
-import member_menu
+import main
 
 # logging
 from log_config import *
 
 def create_account(role):
     while True:
-        member_menu.clear()
+        main.clear()
         print("\n--- Create Account ---")
         userName = input("Enter a username: ")
 
-        connection = sqlite3.connect("MealManagement.db")
+        connection = sqlite3.connect("mealmanagement.db")
         cursor = connection.cursor()
         
         cursor.execute("SELECT username FROM Users Where username =?", (userName,))

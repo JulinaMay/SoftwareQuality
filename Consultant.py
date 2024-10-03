@@ -3,7 +3,7 @@ import sqlite3
 from getpass import getpass
 import bcrypt
 
-import member_menu
+import main
 import time
 
 from validation import *
@@ -15,7 +15,7 @@ from log_config import *
 # MENU
 
 def menu(username):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("SELECT username, password, role_level FROM Users WHERE username = ?", (username,))
@@ -24,7 +24,7 @@ def menu(username):
     role_level = user_data[2]
 
     while True:
-        member_menu.clear()
+        main.clear()
         print(f"Welcome {username} ({role_level})")
         print("\n--- Consultant Menu ---")
 
@@ -34,10 +34,10 @@ def menu(username):
         choice = input("Choose an option (1/2/3): ").strip()
 
         if choice == "1":
-            member_menu.clear()
+            main.clear()
             update_password(username)
         elif choice == "2":
-            member_menu.clear()
+            main.clear()
             print("\n--- Members Menu ---")
 
             print("1. Process member request")
@@ -47,22 +47,22 @@ def menu(username):
             choice = input("Choose an option (1/2/3/4): ").strip()
 
             if choice == "1":
-                member_menu.clear()
+                main.clear()
                 add_member()
             elif choice == "2":
-                member_menu.clear()
+                main.clear()
                 modify_member(username)
             elif choice == "3":
-                member_menu.clear()
+                main.clear()
                 search_member()
             elif choice == "4":
                 continue
             else:
-                member_menu.clear()
+                main.clear()
                 log_activity(f"{username}", "System", "Invalid input in the main menu", "No")
                 time.sleep(2)
         elif choice == "3":
-            member_menu.clear()
+            main.clear()
             log_activity(f"{username}", "System", "Program exited", "No")
             time.sleep(2)
             break
@@ -72,10 +72,10 @@ def menu(username):
 # ACTIONS
 
 def update_password(username): # TODO: Add validation
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
-    member_menu.clear()
+    main.clear()
     print("\n--- Update Password ---")
 
     # Login with current password
@@ -89,23 +89,23 @@ def update_password(username): # TODO: Add validation
         return False
     else:
         while True:
-            member_menu.clear()
+            main.clear()
             print("\n--- Update Password ---")
             new_password = getpass("Enter your new password: ")
             if (new_password == ""):
-                member_menu.clear()
+                main.clear()
                 print("Password can't be empty")
                 log_activity(username, "Update password" "Entered nothing", "No")
                 time.sleep(2)
                 continue
             elif (new_password == input_password):
-                member_menu.clear()
+                main.clear()
                 print("New password can't be the same as the old password")
                 log_activity(username, "Update password" "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
             elif validate_password(new_password):
-                member_menu.clear()
+                main.clear()
                 time.sleep(2)
                 continue
             else:
@@ -113,7 +113,7 @@ def update_password(username): # TODO: Add validation
                 cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
                 connection.commit()
                 connection.close()
-                member_menu.clear()
+                main.clear()
                 print("Password updated successfully")
                 log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
                 time.sleep(2)
@@ -121,11 +121,11 @@ def update_password(username): # TODO: Add validation
         return True
 
 def modify_member(username):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     while True:
-        member_menu.clear()
+        main.clear()
         print("\n--- Modify Member ---")
         print("1. Add a member")
         print("2. Modify a member")
@@ -135,20 +135,20 @@ def modify_member(username):
 
         # Update member
         if choice == "1":
-            member_menu.clear()
+            main.clear()
             add_member("member")
         # Go back
         elif choice == "2":
-            member_menu.clear()
+            main.clear()
             modify_member("member")
         elif choice == "3":
-            member_menu.clear()
+            main.clear()
             search_member()
         elif choice == "4":
             break
         # Invalid input
         else:
-            member_menu.clear()
+            main.clear()
             log_activity(username, "System", "Invalid input at the modifying menu", "No")
             time.sleep(2)
 

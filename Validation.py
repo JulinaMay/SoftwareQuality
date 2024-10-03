@@ -42,11 +42,12 @@ def validate_age(age):
     
     try:
         age = int(age)
-        isInteger = True
-        if 0 <= age <= 120:
-            inRange = True
     except ValueError:
-        pass
+        return False
+    
+    isInteger = True
+    if 0 <= age <= 120:
+        inRange = True
 
     if isInteger and inRange:
         return True
@@ -68,14 +69,14 @@ def validate_weight(weight):
     isFloat = False
     inRange = False
 
-
     try:
-        weight = float(weight)
-        isFloat = True
-        if 0 <= weight <= 300:
-            inRange = True
+        weight = float(weight)        
     except ValueError:
-        pass
+        return False
+
+    isFloat = True
+    if 0 <= weight <= 300:
+        inRange = True
     
     if isFloat and inRange:
         return True
@@ -101,14 +102,15 @@ def validate_street(street):
 def validate_house_number(house_number):
     isInteger = False   
     inRange = False
-
+    
     try:
         house_number = int(house_number)
-        isInteger = True
-        if 0 <= house_number <= 10000:
-            inRange = True
     except ValueError:
-        return True
+        return False
+    
+    isInteger = True
+    if 0 <= house_number <= 10000:
+        inRange = True
     
     if isInteger and inRange:
         return True

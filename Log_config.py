@@ -14,7 +14,7 @@ if not logger.hasHandlers():
     logger.setLevel(logging.INFO)
 
     # Create a TimedRotatingFileHandler
-    log_file = os.path.join('logs', 'MealManagement.log')
+    log_file = os.path.join('logs', 'mealmanagement.log')
     handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=30)
     handler.setLevel(logging.INFO)
 
