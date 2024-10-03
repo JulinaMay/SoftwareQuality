@@ -4,7 +4,7 @@ import database
 # logging
 from log_config import logger
 
-# VALIDATION
+# validation
 
 def validate_first_name(first_name):
     pattern = r"^[a-zA-Z'-]+$" # A-Z, a-z

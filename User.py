@@ -6,7 +6,7 @@ from safe_data import *
 
 import main
 
-# logging
+# logging.
 from log_config import *
 
 def create_account(role):
