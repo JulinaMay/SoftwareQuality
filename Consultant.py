@@ -15,7 +15,7 @@ from log_config import *
 # MENU
 
 def menu(username):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("SELECT username, password, role_level FROM Users WHERE username = ?", (username,))
@@ -72,7 +72,7 @@ def menu(username):
 # ACTIONS
 
 def update_password(username): # TODO: Add validation
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     main.clear()
@@ -121,7 +121,7 @@ def update_password(username): # TODO: Add validation
         return True
 
 def modify_member(username):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     while True:

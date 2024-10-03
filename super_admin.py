@@ -28,7 +28,7 @@ super_password="Admin_123?"
 
 def menu():
     
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     main.clear()
@@ -92,7 +92,7 @@ def menu():
 
 # List of users
 def list_users():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     # Get user data
@@ -153,7 +153,7 @@ def list_users():
 
 # Consultant menu
 def consultant_menu():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
         main.clear()
@@ -174,21 +174,19 @@ def consultant_menu():
             time.sleep(2)
         elif choice == "2":
             main.clear()
-            update_role("consultant")
+            modify_user("consultant")
         elif choice == "3":
             main.clear()
-            modify_user("consultant")
-        elif choice == "4":
             delete_user("consultant")
-        elif choice == "5":
+        elif choice == "4":
             main.clear()
             reset_pw("consultant")
-        elif choice == "6":
+        elif choice == "5":
             break
 
 # System admin menu
 def systemadmin_menu():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
         main.clear()
@@ -229,7 +227,7 @@ def systemadmin_menu():
 
 # System menu
 def system_menu():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
         main.clear()
@@ -237,7 +235,7 @@ def system_menu():
         # Backup and restore
         if not os.path.exists('backup'):
             os.makedirs('backup')
-        db_path = "MealManagement.db"
+        db_path = "mealmanagement.db"
         backup_path = "backup/backup.sql"
         zip_path = "backup/backup.zip"
         log_dir = "logs"
@@ -282,7 +280,7 @@ def system_menu():
 
 # Member menu
 def Main():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
         main.clear()
@@ -315,7 +313,7 @@ def Main():
             connection.close()
 
 def update_role(role):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     # Get information from user
     user_found = False
@@ -365,7 +363,7 @@ def update_role(role):
         break
 
 def modify_user(role):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     
     while True:
@@ -410,7 +408,7 @@ def modify_user(role):
                 """)
         datatype_to_update = input("Enter the field you want to update: ").strip()
         table_to_update = "Members" if role == "member" else "Users"
-        id_to_update    = "user_id" if role == "member" else "id"
+
         if datatype_to_update == "username":
             loop = True
             while loop:
@@ -419,7 +417,7 @@ def modify_user(role):
                 loop = validate_username(username)
                 # update member
                 if not loop:
-                    cursor.execute("UPDATE users SET username = ? WHERE id = ?", (username, id_to_update))
+                    cursor.execute("UPDATE Users SET username = ? WHERE id = ?", (username, id_to_update))
                     connection.commit()
                     print("Username updated successfully")
                     log_activity(super_username, "Update user", f"Updated username of user with username: {decrypted_name}", "No")
@@ -432,8 +430,13 @@ def modify_user(role):
                 loop = validate_first_name(first_name)
                 # update member
                 if not loop:
-                    cursor.execute(f"UPDATE {table_to_update} SET first_name = ? WHERE {id_to_update} = ?", (first_name, id_to_update))
+                    cursor.execute(f"UPDATE Users SET first_name = ? WHERE id = ?", (first_name, id_to_update))
                     connection.commit()
+
+                    if role == "member":
+                        cursor.execute("UPDATE Members SET first_name = ? where user_id = ?", (first_name, id_to_update))
+                        connection.commit()
+                        
                     print("First name updated successfully")
                     log_activity(super_username, "Updated user", f"Updated first name of user with username: {decrypted_name}", "No")
                     time.sleep(2)
@@ -590,7 +593,7 @@ def modify_user(role):
                 continue
 
 def delete_user(role):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     while True:
@@ -618,7 +621,7 @@ def delete_user(role):
 
 def reset_pw(role):
     main.clear()
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     decrypted_name = decrypt_data(private_key(), user[0][1])
     while True:
@@ -644,7 +647,7 @@ def reset_pw(role):
             time.sleep(2)
 
 def add_member():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     print("\n--- Process Member Request ---")
@@ -756,7 +759,7 @@ def input_and_validate(prompt, validate_func, default_value=""):
     return data
 
 def search_member():
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     main.clear()
@@ -815,7 +818,7 @@ def search_member():
     connection.close()
 
 def make_backup(backup_path):
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
 
     with open(backup_path, 'w') as backup_file:
         for line in connection.iterdump():
@@ -900,9 +903,9 @@ def restore_backup(db_path, zip_path):
         time.sleep(2)
 
 def see_logs(date=None):
-    file_path = 'logs/MealManagement.log'
+    file_path = 'logs/mealmanagement.log'
     if date:
-        file_path = f'logs/MealManagement.log.{date}'
+        file_path = f'logs/mealmanagement.log.{date}'
 
     try:
         with open(file_path, 'r') as file:

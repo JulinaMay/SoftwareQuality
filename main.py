@@ -20,9 +20,14 @@ from os import system, name
 import time
 
 def main():
-    database.create_or_connect_db()
-    log_activity("System", "Program started", "No", "No") 
-    main_menu()
+    try:
+        database.create_or_connect_db()
+        log_activity("System", "Program started", "No", "No") 
+        main_menu()
+    except Exception as ex:
+        log_activity("System", f"Program crash created at: {ex}", "No", "No")
+        return
+    
     
 def main_menu():
     while True:
@@ -50,7 +55,7 @@ def Login():
     max_attempts = 3
     attempts = 0
 
-    connection = sqlite3.connect("MealManagement.db")
+    connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("SELECT username, password, first_name, last_name, role_level FROM Users")

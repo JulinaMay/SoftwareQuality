@@ -15,7 +15,7 @@ def create_account(role):
         print("\n--- Create Account ---")
         userName = input("Enter a username: ")
 
-        connection = sqlite3.connect("MealManagement.db")
+        connection = sqlite3.connect("mealmanagement.db")
         cursor = connection.cursor()
         
         cursor.execute("SELECT username FROM Users Where username =?", (userName,))
