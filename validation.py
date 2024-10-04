@@ -1,9 +1,6 @@
 import re
 import database
 
-# logging
-from log_config import logger
-
 # validation
 
 def validate_first_name(first_name):
@@ -44,8 +41,9 @@ def validate_age(age):
         age = int(age)
     except ValueError:
         return False
-    
-    isInteger = True
+    else:
+        isInteger = True
+
     if 0 <= age <= 120:
         inRange = True
 
@@ -73,8 +71,9 @@ def validate_weight(weight):
         weight = float(weight)        
     except ValueError:
         return False
+    else:
+        isFloat = True
 
-    isFloat = True
     if 0 <= weight <= 300:
         inRange = True
     
@@ -107,8 +106,9 @@ def validate_house_number(house_number):
         house_number = int(house_number)
     except ValueError:
         return False
-    
-    isInteger = True
+    else:
+        isInteger = True
+        
     if 0 <= house_number <= 10000:
         inRange = True
     
