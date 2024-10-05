@@ -20,13 +20,13 @@ from os import system, name
 import time
 
 def main():
-    try:
-        database.create_or_connect_db()
-        log_activity("System", "Program started", "No", "No") 
-        main_menu()
-    except Exception as ex:
-        log_activity("System", f"Program crash created at: {ex}", "No", "No")
-        return
+    # try:
+    database.create_or_connect_db()
+    log_activity("System", "Program started", "No", "No") 
+    main_menu()
+    # except Exception as ex:
+    #     log_activity("System", f"Program crash created at: {ex}", "No", "No")
+    #     return
     
     
 def main_menu():
