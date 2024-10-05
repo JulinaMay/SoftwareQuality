@@ -194,8 +194,8 @@ def systemadmin_menu():
         print("1. Make a new system admin")
         print("2. Make an user an admin")
         print("3. Modify admin")
-        print("4. Delete a consultant")
-        print("5. Reset password of a consultant")
+        print("4. Delete a admin")
+        print("5. Reset password of a admin")
         print("6. Go back")
 
         choice = input("Choose an option (1/2/3/4/5/6): ")
@@ -284,7 +284,7 @@ def Main():
     cursor = connection.cursor()
     while True:
         main.clear()
-        print("\n--- System admin menu ---")
+        print("\n--- Member menu ---")
         print("1. Make a member")
         print("2. Modify a member")
         print("3. Delete a member")
@@ -415,8 +415,9 @@ def modify_user(role):
                 print(f"Username at the moment: {decrypted_name}")
                 username = input("Enter username: ").strip()
                 loop = validate_username(username)
+                username = encrypt_data(public_key(), username)
                 # update member
-                if not loop:
+                if loop:
                     cursor.execute("UPDATE Users SET username = ? WHERE id = ?", (username, id_to_update))
                     connection.commit()
                     print("Username updated successfully")
@@ -623,26 +624,31 @@ def reset_pw(role):
     main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
-    decrypted_name = decrypt_data(private_key(), user[0][1])
+    
     while True:
         print(f"\n--- Reset password of {role} ---")
-        choice = input("Go back? (yes/no) ").strip().lower()
-        if choice == "yes" or choice == "y":
-            break
+        
         pw_to_delete = input(f"Enter the id of the {role} for the password you want to delete: ").strip()
 
         cursor.execute("SELECT password FROM Users WHERE id = ?", (pw_to_delete,))
-        user = cursor.fetchall()
+        user_to_change = cursor.fetchall()
 
-        if user == []:
+        if not user_to_change:
             main.clear()
             print("User not found")
             time.sleep(2)
             continue
         else:
+            decrypted_name = decrypt_data(private_key(), user_to_change[0][1])
+    
             cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), pw_to_delete))
             connection.commit()
+            
             print("Password reset successfully")
+            choice = input("Go back? (yes/no) ").strip().lower()
+            if choice == "yes" or choice == "y":
+                break
+
             log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
 
