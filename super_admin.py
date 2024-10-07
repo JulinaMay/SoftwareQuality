@@ -320,9 +320,6 @@ def update_role(role):
     while user_found == False:
         id = input("Enter the id of the user to change their role: ").strip()
 
-        choice = input("Go back? (yes/no)").strip().lower()
-        if choice == "y" or choice == "yes":
-            break
         # Check if user exists in Users table
         user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
         user = user_cursor.fetchone()
@@ -368,9 +365,6 @@ def modify_user(role):
     
     while True:
         print("\n--- Update user ---")
-        choice = input("Go back? (yes/no) ").strip().lower()
-        if choice == "yes" or choice == "y":
-            break
     
         id_to_update = input("Enter the id of the user you want to update: ").strip()
         
@@ -599,10 +593,11 @@ def delete_user(role):
 
     while True:
         print(f"\n--- Delete {role} ---")
-        choice = input("Go back? (yes/no) ").strip().lower()
-        if choice == "yes" or choice == "y":
-            break
         id_to_delete = input(f"Enter the id of the {role} you want to delete: ").strip()
+
+        choice = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
+        if choice == "n":
+            break
         
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
         user = cursor.fetchall()
@@ -612,13 +607,14 @@ def delete_user(role):
             main.clear()
             print("User not found")
             time.sleep(2)
-            continue
+            break
         else:
             cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
             connection.commit()
             print(f"{role} deleted successfully")
             log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
             time.sleep(2)
+            break
 
 def reset_pw(role):
     main.clear()
@@ -645,12 +641,10 @@ def reset_pw(role):
             connection.commit()
             
             print("Password reset successfully")
-            choice = input("Go back? (yes/no) ").strip().lower()
-            if choice == "yes" or choice == "y":
-                break
 
             log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
+            break
 
 def add_member():
     connection = sqlite3.connect("mealmanagement.db")
