@@ -626,7 +626,7 @@ def reset_pw(role):
         
         pw_to_delete = input(f"Enter the id of the {role} for the password you want to delete: ").strip()
 
-        cursor.execute("SELECT password FROM Users WHERE id = ?", (pw_to_delete,))
+        cursor.execute("SELECT username, password FROM Users WHERE id = ?", (pw_to_delete,))
         user_to_change = cursor.fetchall()
 
         if not user_to_change:
@@ -635,7 +635,7 @@ def reset_pw(role):
             time.sleep(2)
             continue
         else:
-            decrypted_name = decrypt_data(private_key(), user_to_change[0][1])
+            decrypted_name = decrypt_data(private_key(), user_to_change[0][0])
     
             cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), pw_to_delete))
             connection.commit()
