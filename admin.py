@@ -20,10 +20,9 @@ def menu(username):
     cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username,))
     user_data = cursor.fetchone()
     print(username)
-    role_level  = user_data[2]
 
     while True:
-        print(f"Welcome {username} ({role_level})")
+        print(f"Welcome {username}")
         print("\n--- System Admin Menu ---")
 
     #Eigen gegevens
@@ -44,8 +43,10 @@ def menu(username):
     # Delete member
     #Search, retriev info of member
         print("5. Member menu")
+    # logout
+        print("6. Logout")
 
-        choice = input("Choose an option (1/2/3/4/5): ").strip()
+        choice = input("Choose an option (1/2/3/4/5/6): ").strip()
 
         if choice == "1":
             main.clear()
@@ -61,6 +62,10 @@ def menu(username):
         elif choice == "5":
             main.clear()    
             Main()
+        elif choice == "6":
+            print("You logged out, Goodbye!")
+            log_activity(username, "System", "Program exited", "No")
+            break
         else:
             main.clear()
             log_activity(username, "System", "Invalid input at the modifying menu", "No")

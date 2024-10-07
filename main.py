@@ -82,11 +82,7 @@ def Login():
 
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
                 attempts = 0  # Reset attempts after a successful login
-                if role_level == "user" or role_level == "member":
-                    role_name = "User" if role_level == "user" else "Member"
-                    print(f"{role_name} is not allowed to login")
-                    log_activity(decrypted_username, "Attempted login", f"{role_name} {first_name} {last_name} is not allowed to login", "No")
-                elif role_level == "consultant":
+                if role_level == "consultant":
                     log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
                     consultant.menu(decrypted_username)
                 elif role_level == "admin":

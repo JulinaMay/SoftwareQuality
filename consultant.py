@@ -60,9 +60,8 @@ def menu(username):
                 log_activity(f"{username}", "System", "Invalid input in the main menu", "No")
                 time.sleep(2)
         elif choice == "3":
-            main.clear()
-            log_activity(f"{username}", "System", "Program exited", "No")
-            time.sleep(2)
+            print("You logged out, Goodbye!")
+            log_activity(super_username, "System", "Program exited", "No")
             break
         else:
             log_activity(f"{username}", "System", "Invalid input in the main menu", "No")
