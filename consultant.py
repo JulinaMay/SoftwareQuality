@@ -18,14 +18,12 @@ def menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
-    cursor.execute("SELECT username, password, role_level FROM Users WHERE username = ?", (username,))
+    cursor.execute("SELECT username, password FROM Users WHERE username = ?", (username,))
     user_data = cursor.fetchone()
-
-    role_level = user_data[2]
 
     while True:
         main.clear()
-        print(f"Welcome {username} ({role_level})")
+        print(f"Welcome {username}")
         print("\n--- Consultant Menu ---")
 
         print("1. Update password")
