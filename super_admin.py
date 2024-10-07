@@ -644,6 +644,7 @@ def reset_pw(role):
 
             log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
+            break
 
 def add_member():
     connection = sqlite3.connect("mealmanagement.db")
