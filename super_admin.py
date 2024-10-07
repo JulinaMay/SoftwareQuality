@@ -62,7 +62,7 @@ def menu():
     # Delete member
     #Search, retriev info of member
         print("5. Member menu")
-        print("6. Exit")
+        print("6. Logout")
         choice = input("Choose an option (1/2/3/4/5): ").strip()
 
         if choice == "1":
@@ -81,7 +81,7 @@ def menu():
             main.clear()
             Main()
         elif choice == "6":
-            print("Exiting the program. Goodbye!")
+            print("You logged out, Goodbye!")
             log_activity(super_username, "System", "Program exited", "No")
             break
         else:
