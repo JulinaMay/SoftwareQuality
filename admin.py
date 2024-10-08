@@ -72,20 +72,32 @@ def menu(username):
             time.sleep(2)
 
 # Functies
-def update_password(username):
+def update_password(username): # TODO: Add validation
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
+
     main.clear()
     print("\n--- Update Password ---")
-
     # Login with current password
-    cursor.execute("SELECT username, password FROM Users WHERE username =?", (username,))
-    user_data = cursor.fetchone()
+    cursor.execute("SELECT * FROM Users")
+    user_data = cursor.fetchall()
+    decrypted_username = ""
+    found_password = ""
+    for i in range(len(user_data)):
+        decrypted_username = decrypt_data(private_key(), user_data[i][1])
+        if decrypted_username == username:
+            found_password = user_data[i][2]
+            break
 
+        # check if have reached end of loop
+        if i == len(user_data) - 1:
+            print("User not found")
+            log_activity(username, "Update password" "Nonexistent consultant tried to update password", "Yes")
+            exit()
+            
     # Check if password is correct
     input_password = getpass("Enter your current password: ")
-    if not bcrypt.checkpw(input_password.encode('utf-8'), user_data[1]):
-        print("Incorrect password")
+    if not bcrypt.checkpw(input_password.encode('utf-8'), found_password):
         log_activity(username, "Update password" "Incorrect password", "No")
         return False
     else:
@@ -105,9 +117,26 @@ def update_password(username):
                 log_activity(username, "Update password" "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
+            elif validate_password(new_password):
+                main.clear()
+                time.sleep(2)
+                continue
             else:
+                # enter password in database
                 hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-                cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, username))
+
+                # Hier gaat het fout, je moet de username encrypten voordat je het in de database opzoekt
+                cursor.execute("SELECT * FROM Users")
+                user_data = cursor.fetchall()
+                decrypted_username = ""
+                for i in range(len(user_data)):
+                    decrypted_username = decrypt_data(private_key(), user_data[i][1])
+                    if decrypted_username == username:
+                        encrypted_username = user_data[i][1]
+                        break
+
+                cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (hashed_password, encrypted_username))
+
                 connection.commit()
                 connection.close()
                 main.clear()
@@ -116,6 +145,5 @@ def update_password(username):
                 time.sleep(2)
                 break
         return True
-
 
 
