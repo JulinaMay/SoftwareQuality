@@ -315,42 +315,28 @@ def modify_user(role):
     while True:
         print("\n--- Update user ---")
     
+        who_to_update = input("Do you want to modify a employee or a member: ").strip()
         id_to_update = input("Enter the id of the user you want to update: ").strip()
         
-        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_update,))
-        user = cursor.fetchall()
+        if who_to_update == "employee".lower():
+                
+            cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_update,))
+            user = cursor.fetchall()
 
-        if not user:
-            main.clear()
-            print("User not found")
-            time.sleep(2)
-            continue
+            if not user:
+                main.clear()
+                print("User not found")
+                time.sleep(2)
+                continue
 
-        decrypted_name = decrypt_data(private_key(), user[0][1])
-        
-        if role == "member":
-            print("""List of datatypes:
-                        first_name
-                        last_name
-                        age
-                        gender
-                        weight
-                        street
-                        house_number
-                        postal_code
-                        city
-                        country
-                        email
-                        phone_number
-                """)
-        else:
+            decrypted_name = decrypt_data(private_key(), user[0][1])
             print("""List of fields:
-                    username
-                    first_name
-                    last_name
-                """)
+                username
+                first_name
+                last_name
+            """)
         datatype_to_update = input("Enter the field you want to update: ").strip()
-        table_to_update = "Members" if role == "member" else "Users"
+        # table_to_update = "Members" if role == "member" else "Users"
 
         if datatype_to_update == "username":
             loop = False
@@ -376,10 +362,6 @@ def modify_user(role):
                 if not loop:
                     cursor.execute(f"UPDATE Users SET first_name = ? WHERE id = ?", (first_name, id_to_update))
                     connection.commit()
-
-                    if role == "member":
-                        cursor.execute("UPDATE Members SET first_name = ? where user_id = ?", (first_name, id_to_update))
-                        connection.commit()
                         
                     print("First name updated successfully")
                     log_activity(super_username, "Updated user", f"Updated first name of user with username: {decrypted_name}", "No")
@@ -392,143 +374,160 @@ def modify_user(role):
                 loop = validate_last_name(last_name)
                 # update member
                 if not loop:
-                    cursor.execute(f"UPDATE {table_to_update} SET last_name = ? WHERE {id_to_update} = ?", (last_name, id_to_update))
+                    cursor.execute(f"UPDATE Users SET last_name = ? WHERE id = ?", (last_name, id_to_update))
                     connection.commit()
                     print("Last name updated successfully")
                     log_activity(super_username, "Update user", f"Updated last name of user with username: {decrypted_name}", "No")
                     time.sleep(2)
                     break
-        if role == "member":
-            if datatype_to_update == "age":
-                    loop = True
-                    while loop:
-                        age = input("Enter age: ").strip()
-                        loop = validate_age(age)
-                        # update member
-                        if not loop:
-                            cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
-                            connection.commit()
-                            print("Age updated successfully")
-                            log_activity(super_username, "Update user", f"Updated age of user with username: {decrypted_name}", "No")
-                            time.sleep(2)
-                            break
-            elif datatype_to_update == "gender":
-                loop = True
-                while loop:
-                    gender = input("Enter gender: ").strip().capitalize()
-                    loop = validate_gender(gender)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET gender = ? WHERE user_id = ?", (gender, id_to_update))
-                        connection.commit()
-                        print("Gender updated successfully")
-                        log_activity(super_username, "Update user", f"Updated gender of usre with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "weight":
-                loop = True
-                while loop:
-                    weight = input("Enter weight: ").strip()
-                    loop = validate_weight(weight)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET weight = ? WHERE user_id = ?", (weight, id_to_update))
-                        connection.commit()
-                        print("Weight updated successfully")
-                        log_activity(super_username, "Update user", f"Updated weight of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "street":
-                loop = True
-                while loop:
-                    street = input("Enter street: ").strip().title()
-                    loop = validate_street(street)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET street = ? WHERE user_id = ?", (street, id_to_update))
-                        connection.commit()
-                        print("Street updated successfully")
-                        log_activity(super_username, "Update user", f"Updated street of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "house_number":
-                loop = True
-                while loop:
-                    house_number = input("Enter house number: ").strip()
-                    loop = validate_house_number(house_number)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET house_number = ? WHERE user_id = ?", (house_number, id_to_update))
-                        connection.commit()
-                        print("House number updated successfully")
-                        log_activity(super_username, "Update user", f"Updated house number of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "postal_code":
-                loop = True
-                while loop:
-                    postal_code = input("Enter postal code: ").strip()
-                    loop = validate_postal_code(postal_code)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET postal_code = ? WHERE user_id = ?", (postal_code, id_to_update))
-                        connection.commit()
-                        print("Postal code updated successfully")
-                        log_activity(super_username, "Update user", f"Updated postal code of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "city":
-                loop = True
-                while loop:
-                    city = input("Enter city: ").strip().capitalize()
-                    loop = validate_city(city)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET city = ? WHERE user_id = ?", (city, id_to_update))
-                        connection.commit()
-                        print("City updated successfully")
-                        log_activity(super_username, "Update user", f"Updated city of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "country":
-                loop = True
-                while loop:
-                    country = input("Enter country: ").strip().capitalize()
-                    loop = validate_country(country)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET country = ? WHERE user_id = ?", (country, id_to_update))
-                        connection.commit()
-                        print("Country updated successfully")
-                        log_activity(super_username, "Update user", f"Updated country of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "email":
-                loop = True
-                while loop:
-                    email = input("Enter email: ").strip().lower()
-                    loop = validate_email(email)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET email = ? WHERE user_id = ?", (email, id_to_update))
-                        connection.commit()
-                        print("Email updated successfully")
-                        log_activity(super_username, "Update user", f"Updated email of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
-            elif datatype_to_update == "phone_number":
-                loop = True
-                while loop:
-                    phone_number = input("Enter phone number: ").strip()
-                    loop = validate_phone_number(phone_number)
-                    # update member
-                    if not loop:
-                        cursor.execute("UPDATE Members SET phone_number = ? WHERE user_id = ?", (phone_number, id_to_update))
-                        connection.commit()
-                        print("Phone number updated successfully")
-                        log_activity(super_username, "Update user", f"Updated phone number of user with username: {decrypted_name}", "No")
-                        time.sleep(2)
-                        break
+        # if role == "member":
+        #     print("""List of datatypes:
+        #                 first_name
+        #                 last_name
+        #                 age
+        #                 gender
+        #                 weight
+        #                 street
+        #                 house_number
+        #                 postal_code
+        #                 city
+        #                 country
+        #                 email
+        #                 phone_number
+        #         """)
+
+        
+        # if role == "member":
+        #     if datatype_to_update == "age":
+        #             loop = True
+        #             while loop:
+        #                 age = input("Enter age: ").strip()
+        #                 loop = validate_age(age)
+        #                 # update member
+        #                 if not loop:
+        #                     cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
+        #                     connection.commit()
+        #                     print("Age updated successfully")
+        #                     log_activity(super_username, "Update user", f"Updated age of user with username: {decrypted_name}", "No")
+        #                     time.sleep(2)
+        #                     break
+        #     elif datatype_to_update == "gender":
+        #         loop = True
+        #         while loop:
+        #             gender = input("Enter gender: ").strip().capitalize()
+        #             loop = validate_gender(gender)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET gender = ? WHERE user_id = ?", (gender, id_to_update))
+        #                 connection.commit()
+        #                 print("Gender updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated gender of usre with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "weight":
+        #         loop = True
+        #         while loop:
+        #             weight = input("Enter weight: ").strip()
+        #             loop = validate_weight(weight)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET weight = ? WHERE user_id = ?", (weight, id_to_update))
+        #                 connection.commit()
+        #                 print("Weight updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated weight of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "street":
+        #         loop = True
+        #         while loop:
+        #             street = input("Enter street: ").strip().title()
+        #             loop = validate_street(street)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET street = ? WHERE user_id = ?", (street, id_to_update))
+        #                 connection.commit()
+        #                 print("Street updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated street of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "house_number":
+        #         loop = True
+        #         while loop:
+        #             house_number = input("Enter house number: ").strip()
+        #             loop = validate_house_number(house_number)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET house_number = ? WHERE user_id = ?", (house_number, id_to_update))
+        #                 connection.commit()
+        #                 print("House number updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated house number of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "postal_code":
+        #         loop = True
+        #         while loop:
+        #             postal_code = input("Enter postal code: ").strip()
+        #             loop = validate_postal_code(postal_code)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET postal_code = ? WHERE user_id = ?", (postal_code, id_to_update))
+        #                 connection.commit()
+        #                 print("Postal code updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated postal code of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "city":
+        #         loop = True
+        #         while loop:
+        #             city = input("Enter city: ").strip().capitalize()
+        #             loop = validate_city(city)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET city = ? WHERE user_id = ?", (city, id_to_update))
+        #                 connection.commit()
+        #                 print("City updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated city of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "country":
+        #         loop = True
+        #         while loop:
+        #             country = input("Enter country: ").strip().capitalize()
+        #             loop = validate_country(country)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET country = ? WHERE user_id = ?", (country, id_to_update))
+        #                 connection.commit()
+        #                 print("Country updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated country of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "email":
+        #         loop = True
+        #         while loop:
+        #             email = input("Enter email: ").strip().lower()
+        #             loop = validate_email(email)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET email = ? WHERE user_id = ?", (email, id_to_update))
+        #                 connection.commit()
+        #                 print("Email updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated email of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
+        #     elif datatype_to_update == "phone_number":
+        #         loop = True
+        #         while loop:
+        #             phone_number = input("Enter phone number: ").strip()
+        #             loop = validate_phone_number(phone_number)
+        #             # update member
+        #             if not loop:
+        #                 cursor.execute("UPDATE Members SET phone_number = ? WHERE user_id = ?", (phone_number, id_to_update))
+        #                 connection.commit()
+        #                 print("Phone number updated successfully")
+        #                 log_activity(super_username, "Update user", f"Updated phone number of user with username: {decrypted_name}", "No")
+        #                 time.sleep(2)
+        #                 break
             else:
                 main.clear()
                 print("Invalid input")
