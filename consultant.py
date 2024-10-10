@@ -88,13 +88,13 @@ def update_password(username): # TODO: Add validation
         # check if have reached end of loop
         if i == len(user_data) - 1:
             print("User not found")
-            log_activity(username, "Update password" "Nonexistent consultant tried to update password", "Yes")
+            log_activity(username, "Update password", "Nonexistent consultant tried to update password", "Yes")
             exit()
             
     # Check if password is correct
     input_password = getpass("Enter your current password: ")
     if not bcrypt.checkpw(input_password.encode('utf-8'), found_password):
-        log_activity(username, "Update password" "Incorrect password", "No")
+        log_activity(username, "Update password", "Incorrect password", "No")
         return False
     else:
         while True:
@@ -104,13 +104,13 @@ def update_password(username): # TODO: Add validation
             if (new_password == ""):
                 main.clear()
                 print("Password can't be empty")
-                log_activity(username, "Update password" "Entered nothing", "No")
+                log_activity(username, "Update password", "Entered nothing", "No")
                 time.sleep(2)
                 continue
             elif (new_password == input_password):
                 main.clear()
                 print("New password can't be the same as the old password")
-                log_activity(username, "Update password" "Entered same password as the old password", "No")
+                log_activity(username, "Update password", "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
             elif validate_password(new_password):
@@ -137,7 +137,7 @@ def update_password(username): # TODO: Add validation
                 connection.close()
                 main.clear()
                 print("Password updated successfully")
-                log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
+                log_activity(username, "Update password", f"Password updated successfully for user: '{username}'", "No")
                 time.sleep(2)
                 break
         return True
