@@ -51,7 +51,6 @@ def main_menu():
             time.sleep(2)
 
 def Login():
-    clear()
     max_attempts = 3
     attempts = 0
 
@@ -62,6 +61,7 @@ def Login():
     data = cursor.fetchall()
 
     while attempts < max_attempts:
+        clear()
         print("\n--- Login ---")
         username = input("Enter your username: ")
         password = getpass("Enter your password: ")

@@ -15,6 +15,7 @@ from log_config import *
 # MENU.
 
 def menu(username):
+    main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 

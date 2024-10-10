@@ -13,13 +13,12 @@ from super_admin import *
 from log_config import *
 
 def menu(username):
-    
+    main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username,))
     user_data = cursor.fetchone()
-    print(username)
 
     while True:
         print(f"Welcome {username}")
