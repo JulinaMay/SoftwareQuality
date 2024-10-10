@@ -13,13 +13,12 @@ from super_admin import *
 from log_config import *
 
 def menu(username):
-    
+    main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     cursor.execute("SELECT username, password, role_level FROM Users WHERE username =?", (username,))
     user_data = cursor.fetchone()
-    print(username)
 
     while True:
         print(f"Welcome {username}")
@@ -105,20 +104,16 @@ def update_password(username): # TODO: Add validation
             main.clear()
             print("\n--- Update Password ---")
             new_password = getpass("Enter your new password: ")
-            if (new_password == ""):
-                main.clear()
-                print("Password can't be empty")
-                log_activity(username, "Update password" "Entered nothing", "No")
-                time.sleep(2)
-                continue
-            elif (new_password == input_password):
+            if (new_password == input_password):
                 main.clear()
                 print("New password can't be the same as the old password")
-                log_activity(username, "Update password" "Entered same password as the old password", "No")
+                log_activity(username, "Update password", "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
-            elif validate_password(new_password):
+            elif (not validate_password(new_password)):
                 main.clear()
+                print("Invalid password")
+                log_activity(username, "Update password", "Invalid password", "No")
                 time.sleep(2)
                 continue
             else:
