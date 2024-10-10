@@ -27,7 +27,7 @@ super_username="super_admin"
 super_password="Admin_123?"
 
 def menu():
-    
+    main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
