@@ -8,8 +8,9 @@ def validate_first_name(first_name):
     length = False
     syntax = False
 
-    if len(first_name) < 15:
+    if len(first_name) <= 15:
         length = True
+
     if re.match(pattern, first_name):
         syntax = True
 

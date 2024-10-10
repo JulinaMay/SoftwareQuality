@@ -16,7 +16,7 @@ import bcrypt
 from safe_data import *
 
 import time
-import datetime
+from datetime import datetime
 import random
 import zipfile
 import os
@@ -192,11 +192,10 @@ def systemadmin_menu():
         main.clear()
         print("\n--- System admin menu ---")
         print("1. Make a new system admin")
-        print("2. Make an user an admin")
-        print("3. Modify admin")
-        print("4. Delete a admin")
-        print("5. Reset password of a admin")
-        print("6. Go back")
+        print("2. Modify admin")
+        print("3. Delete a admin")
+        print("4. Reset password of a admin")
+        print("5. Go back")
 
         choice = input("Choose an option (1/2/3/4/5/6): ")
 
@@ -208,17 +207,14 @@ def systemadmin_menu():
             time.sleep(2)
         elif choice == "2":
             main.clear()
-            update_role("admin")
+            modify_user("admin")
         elif choice == "3":
             main.clear()
-            modify_user("admin")
+            delete_user("admin")
         elif choice == "4":
             main.clear()
-            delete_user("admin")
-        elif choice == "5":
-            main.clear()
             reset_pw("admin")
-        elif choice == "6":
+        elif choice == "5":
             break
         else:
             print("Invalid input")
@@ -650,47 +646,12 @@ def add_member():
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
-    print("\n--- Process Member Request ---")
-
-    # Get information from user
-    user_found = False
-    while user_found == False:
-        id = input("Enter user id: ").strip()
-
-        # Check if user exists in Users table
-        user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
-        user = user_cursor.fetchone()
-        if user is None:
-            while True:
-                main.clear()
-                print("User not found")
-                choice = input("Go back? (y/n)").strip().lower()
-                if choice == "y":
-                    return
-                elif choice == "n":
-                    break
-                else:
-                    print("Invalid input")
-                    continue
-        else:
-            user_found = True
-    
-    # Check if user is already a member
-    cursor.execute(f"SELECT * FROM Members WHERE user_id = '{id}'")
-    member = cursor.fetchall()
-    if member != []:
-        print("User is already a member")
-        return
-    
-    # decrypt user data
-    first_name = decrypt_data(private_key(), user[3])
-    last_name = decrypt_data(private_key(), user[4])
-
     main.clear()
     print("\n--- Process member Request ---")
-    print(f"User: {first_name} {last_name}\n")
 
     # Input and validation
+    first_name = input_and_validate("Enter first name: ", validate_first_name)
+    last_name = input_and_validate("Enter last name: ", validate_last_name)
     age = input_and_validate("Enter age: ", validate_age)
     gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender)
     weight = input_and_validate("Enter weight (kg): ", validate_weight)
@@ -703,13 +664,15 @@ def add_member():
     phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
     
     #  Create unique member_id
-    user_registration_year = user[5].split("-")[0]
-    member_id = str(user_registration_year[-2:])
+    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    member_id = ''.join(filter(str.isdigit, current_date))
+
     checksum = sum(int(digit) for digit in member_id)
     for i in range(7):
         random_number = random.randint(0, 9)
         member_id += str(random_number) 
         checksum += random_number
+
     checksum %= 10
     member_id += str(checksum)
 
@@ -738,9 +701,6 @@ def add_member():
         (member_id, id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
     )
 
-    # Update role level in Users table
-    cursor.execute(f"UPDATE Users SET role_level = 'member' WHERE id = '{id}'")
-
     connection.commit()
     connection.close()
 
@@ -752,8 +712,8 @@ def add_member():
     return (first_name, last_name)
 
 def input_and_validate(prompt, validate_func, default_value=""):
-    loop = True
-    while loop:
+    loop = False
+    while not loop:
         data = default_value or input(prompt).strip()
         loop = validate_func(data)
     return data
