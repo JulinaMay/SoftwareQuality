@@ -79,7 +79,7 @@ def menu():
             system_menu()
         elif choice == "5":
             main.clear()
-            Main()
+            member_menu()
         elif choice == "6":
             print("You logged out, Goodbye!")
             log_activity(super_username, "System", "Program exited", "No")
@@ -275,7 +275,7 @@ def system_menu():
         connection.close()
 
 # Member menu
-def Main():
+def member_menu():
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -307,53 +307,6 @@ def Main():
             print("Invalid input")
             log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
-
-def update_role(role):
-    connection = sqlite3.connect("mealmanagement.db")
-    cursor = connection.cursor()
-    # Get information from user
-    user_found = False
-    while user_found == False:
-        id = input("Enter the id of the user to change their role: ").strip()
-
-        # Check if user exists in Users table
-        user_cursor = cursor.execute(f"SELECT * FROM Users WHERE id = '{id}'")
-        user = user_cursor.fetchone()
-        if user is None:
-            print("User not found")
-        elif role == "member":
-            cursor.execute("SELECT * FROM Members WHERE user_id = ?", (id))
-            member = cursor.fetchall()
-            decrypt_member = decrypt_data(private_key(), member[0][2])
-            sure = input(f"Are you sure you want to delete {decrypt_member} from member list? (yes/no): ").strip().lower()
-            if sure == "yes" or sure == "y":
-                main.clear()
-                cursor.execute("DELETE FROM Members WHERE user_id = ?", (id))
-                connection.commit()
-                print(f"{decrypt_member} deleted from member list")
-                log_activity(super_username, "Delete member", f"Deleted member: '{decrypt_member}'", "No")
-                time.sleep(2)
-            elif sure == "n":
-                main.clear()
-                print("No member deleted")
-                log_activity(super_username, "Delete member", "No member deleted", "No")
-                time.sleep(2)
-            else:
-                main.clear()
-                log_activity(super_username, "Update role", "Invalid input in the member menu", "No")
-                time.sleep(2)
-                continue
-        else:
-            user_found = True
-            cursor.execute(f"UPDATE Users SET role_level = '{role}' WHERE id = '{id}'")
-            
-            connection.commit()
-            connection.close()  
-            print("Changed succesfully")
-            decrypted_name = decrypt_data(private_key(), user[0][1])
-            log_activity(super_username, "Update role", f"Changed user: {decrypted_name} into {role}", "No")
-            time.sleep(2)
-        break
 
 def modify_user(role):
     connection = sqlite3.connect("mealmanagement.db")
@@ -400,7 +353,7 @@ def modify_user(role):
         table_to_update = "Members" if role == "member" else "Users"
 
         if datatype_to_update == "username":
-            loop = True
+            loop = False
             while loop:
                 print(f"Username at the moment: {decrypted_name}")
                 username = input("Enter username: ").strip()
@@ -415,8 +368,8 @@ def modify_user(role):
                     time.sleep(2)
                     break
         elif datatype_to_update == "first_name":
-            loop = True
-            while loop:
+            loop = False
+            while not loop:
                 first_name = input("Enter new first name: ").strip()
                 loop = validate_first_name(first_name)
                 # update member
@@ -433,8 +386,8 @@ def modify_user(role):
                     time.sleep(2)
                     break
         elif datatype_to_update == "last_name":
-            loop = True
-            while loop:
+            loop = False
+            while not loop:
                 last_name = input("Enter last name: ").strip()
                 loop = validate_last_name(last_name)
                 # update member
@@ -650,22 +603,25 @@ def add_member():
     print("\n--- Process member Request ---")
 
     # Input and validation
-    first_name = input_and_validate("Enter first name: ", validate_first_name)
-    last_name = input_and_validate("Enter last name: ", validate_last_name)
-    age = input_and_validate("Enter age: ", validate_age)
-    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender)
-    weight = input_and_validate("Enter weight (kg): ", validate_weight)
-    street = input_and_validate("Enter street: ", validate_street)
-    house_number = input_and_validate("Enter house number: ", validate_house_number)
-    postal_code = input_and_validate("Enter postal code: ", validate_postal_code)
-    city = input_and_validate("Enter city: ", validate_city)
-    country = input_and_validate("Enter country: ", validate_country)
-    email = input_and_validate("Enter email: ", validate_email)
-    phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
+    first_name = input_and_validate("Enter first name: ", validate_first_name, "Karlijn")
+    last_name = input_and_validate("Enter last name: ", validate_last_name, "hofman")
+    age = input_and_validate("Enter age: ", validate_age, "19")
+    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender, "Male")
+    weight = input_and_validate("Enter weight (kg): ", validate_weight, "80")
+    street = input_and_validate("Enter street: ", validate_street, "abc")
+    house_number = input_and_validate("Enter house number: ", validate_house_number, "99")
+    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1234AB")
+    city = input_and_validate("Enter city: ", validate_city, "Rotterdam")
+    country = input_and_validate("Enter country: ", validate_country, "Nederland")
+    email = input_and_validate("Enter email: ", validate_email, "karlijn@gmail.com")
+    phone_number = input_and_validate("Enter phone number: ", validate_phone_number, "+31 6 12345678")
     
     #  Create unique member_id
-    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    member_id = ''.join(filter(str.isdigit, current_date))
+    current_date = str(datetime.now().year)
+    print(type(current_date))
+    print(current_date[-2:])
+    member_id = current_date[-2:]
+    print(member_id)
 
     checksum = sum(int(digit) for digit in member_id)
     for i in range(7):
@@ -675,7 +631,7 @@ def add_member():
 
     checksum %= 10
     member_id += str(checksum)
-
+    print(f"stopt het hier? {member_id}")
     # encryption
     enc_first_name = encrypt_data(public_key(), first_name)
     enc_last_name = encrypt_data(public_key(), last_name)
@@ -689,16 +645,17 @@ def add_member():
     enc_country = encrypt_data(public_key(), country)
     enc_email = encrypt_data(public_key(), email)
     enc_phone_number = encrypt_data(public_key(), phone_number)
+    print(f"member_id: {member_id}, type: {type(member_id)}")
 
     # Insert member into Members table
     cursor.execute(
         """
         INSERT INTO Members (
-            member_id, user_id, first_name, last_name, age, gender, weight, street,
+            member_id, first_name, last_name, age, gender, weight, street,
             house_number, postal_code, city, country, email, phone_number
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, 
-        (member_id, id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
+        (member_id, enc_first_name, enc_last_name, enc_age, enc_gender, enc_weight, enc_street, enc_house_number, enc_postal_code, enc_city, enc_country, enc_email, enc_phone_number)
     )
 
     connection.commit()
@@ -710,26 +667,26 @@ def add_member():
     time.sleep(2)
 
     return (first_name, last_name)
-
+    
 def input_and_validate(prompt, validate_func, default_value=""):
-    loop = False
-    while not loop:
-        data = default_value or input(prompt).strip()
-        loop = validate_func(data)
-    return data
+    data = default_value or input(prompt).strip()
+    if validate_func(data):
+        return data
+    else:
+        print("Invalid input provided.")
+        log_activity("test", "idk", "invalid", "No")
+
 
 def search_member():
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     main.clear()
-    print("\n--- Retrieve Member Data ---")
-    main.clear()
     print("\n--- Retrieve member ---")
     search = input("Search: ").strip()
     search = f"%{search}%"
 
-    cursor.execute(f"SELECT * FROM Members WHERE user_id LIKE ? OR member_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR age LIKE ? OR gender LIKE ? OR weight LIKE ? OR street LIKE ? OR house_number LIKE ? OR postal_code LIKE ? OR city LIKE ? OR country LIKE ? OR email LIKE ? OR phone_number LIKE ?", (search, search, search, search, search, search, search, search, search, search, search, search, search, search))
+    cursor.execute(f"SELECT * FROM Members WHERE first_name LIKE ? OR member_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR age LIKE ? OR gender LIKE ? OR weight LIKE ? OR street LIKE ? OR house_number LIKE ? OR postal_code LIKE ? OR city LIKE ? OR country LIKE ? OR email LIKE ? OR phone_number LIKE ?", (search, search, search, search, search, search, search, search, search, search, search, search, search, search))
     members = cursor.fetchall()
     
     # Check if any members are found

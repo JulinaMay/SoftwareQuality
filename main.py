@@ -21,6 +21,7 @@ import time
 
 def main():
     # try:
+    database.clear_database()
     database.create_or_connect_db()
     log_activity("System", "Program started", "No", "No") 
     main_menu()

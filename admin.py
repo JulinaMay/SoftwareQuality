@@ -60,7 +60,7 @@ def menu(username):
             system_menu()
         elif choice == "5":
             main.clear()    
-            Main()
+            member_menu()
         elif choice == "6":
             print("You logged out, Goodbye!")
             log_activity(username, "System", "Program exited", "No")
@@ -106,7 +106,7 @@ def update_password(username): # TODO: Add validation
             new_password = getpass("Enter your new password: ")
             if (new_password == input_password):
                 main.clear()
-                print("New password can't be the same as the old password")
+                print("Invalid password")
                 log_activity(username, "Update password", "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
