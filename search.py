@@ -61,7 +61,7 @@ def search(search_term, table, column="*"):
             search_results.append(decrypted_data)
         
     if len(search_results) == 1:
-            return f"No results found for '{search_term}'"
+            return []
 
     return search_results
 
