@@ -15,6 +15,9 @@ from log_config import *
 import bcrypt
 from safe_data import *
 
+# search
+from search import *
+
 import time
 from datetime import datetime
 import random
@@ -308,232 +311,267 @@ def member_menu():
             log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
 
+def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> bool:
+    connection = sqlite3.connect("mealmanagement.db")
+    cursor = connection.cursor()
+
+    new_data = encrypt_data(public_key(), new_data)
+
+    if table_to_update == "Users":
+        cursor.execute(f"UPDATE {table_to_update} SET {datatype_to_update} = ? WHERE id = ?", (new_data, id_to_update))
+        connection.commit()
+    if table_to_update == "Members":
+        cursor.execute(f"UPDATE {table_to_update} SET {datatype_to_update} = ? WHERE member_id = ?", (new_data, id_to_update))
+        connection.commit()
+    
+    if cursor.rowcount == 0:
+            print(f"No rows found with id {id_to_update}.")
+            time.sleep(2)
+            return False
+
+    return True
+
 def modify_user(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     
     while True:
+        main.clear()
         print("\n--- Update user ---")
     
-        who_to_update = input("Do you want to modify a employee or a member: ").strip()
-        id_to_update = input("Enter the id of the user you want to update: ").strip()
+        # Search for user
+        if role == "admin" or role == "consultant":
+            main.clear()
+            search_term = input("Enter search term: ").strip()
+            search_results = search(search_term, "Users")
+            display_search_results(search_results)
+            # menu
+            try:
+                choice = int(input("\nEnter the number of the result you want to choose (or 0 to cancel): "))
+                if choice == 0:
+                    print("Operation canceled.")
+                    break
+                elif 1 <= choice <= len(search_results):
+                    selected_result = search_results[choice]
+                    main.clear()
+                    print(f"Selected user: {selected_result[1]}")
+                else:
+                    print("Invalid choice. Please select a valid number.")
+                    input("Press enter to continue")
+            except ValueError:
+                print("Please enter a number.")
+            
+            while True:
+                print("\n 1. Username")
+                print(" 2. First name")
+                print(" 3. Last name")
+                choice = input("Choose the datatype you want to change (1/2/3): ")
+                if choice == "1":
+                    new_data = input("Enter new username: ").strip()
+                    if modify_data("username", "Users", selected_result[0], new_data):
+                        main.clear()
+                        print("Username updated successfully")
+                        time.sleep(2)
+                        break
+                    else:
+                        print("Username not updated")
+                        break
+                elif choice == "2":
+                    new_data = input("Enter new first name: ").strip()
+                    if modify_data("first_name", "Users", selected_result[0], new_data):
+                        main.clear()
+                        print("First name updated successfully")
+                        time.sleep(2)
+                        break
+                    else:
+                        print("First name not updated")
+                        break 
+                elif choice == "3":
+                    new_data = input("Enter new last name: ").strip()
+                    if modify_data("last_name", "Users", selected_result[0], new_data):
+                        main.clear()
+                        print("Last name updated successfully")
+                        time.sleep(2)
+                        break
+                    else:
+                        print("Last name not updated")
+                        break
+                else:
+                    print("Invalid input")
+                    time.sleep(2)
+                    return
         
-        if who_to_update == "employee".lower():
-                
-            cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_update,))
-            user = cursor.fetchall()
-
-            if not user:
+        # Search for member
+        elif role == "member":
+            search_term = input("Enter search term: ").strip()
+            search_results = search(search_term, "Members")
+            if (len(search_results) == 0):
                 main.clear()
-                print("User not found")
+                print("No members found")
                 time.sleep(2)
-                continue
-
-            decrypted_name = decrypt_data(private_key(), user[0][1])
-            print("""List of fields:
-                username
-                first_name
-                last_name
-            """)
-        datatype_to_update = input("Enter the field you want to update: ").strip()
-        # table_to_update = "Members" if role == "member" else "Users"
-
-        if datatype_to_update == "username":
-            loop = False
-            while loop:
-                print(f"Username at the moment: {decrypted_name}")
-                username = input("Enter username: ").strip()
-                loop = validate_username(username)
-                username = encrypt_data(public_key(), username)
-                # update member
-                if loop:
-                    cursor.execute("UPDATE Users SET username = ? WHERE id = ?", (username, id_to_update))
-                    connection.commit()
-                    print("Username updated successfully")
-                    log_activity(super_username, "Update user", f"Updated username of user with username: {decrypted_name}", "No")
-                    time.sleep(2)
-                    break
-        elif datatype_to_update == "first_name":
-            loop = False
-            while not loop:
-                first_name = input("Enter new first name: ").strip()
-                loop = validate_first_name(first_name)
-                # update member
-                if not loop:
-                    cursor.execute(f"UPDATE Users SET first_name = ? WHERE id = ?", (first_name, id_to_update))
-                    connection.commit()
-                        
-                    print("First name updated successfully")
-                    log_activity(super_username, "Updated user", f"Updated first name of user with username: {decrypted_name}", "No")
-                    time.sleep(2)
-                    break
-        elif datatype_to_update == "last_name":
-            loop = False
-            while not loop:
-                last_name = input("Enter last name: ").strip()
-                loop = validate_last_name(last_name)
-                # update member
-                if not loop:
-                    cursor.execute(f"UPDATE Users SET last_name = ? WHERE id = ?", (last_name, id_to_update))
-                    connection.commit()
-                    print("Last name updated successfully")
-                    log_activity(super_username, "Update user", f"Updated last name of user with username: {decrypted_name}", "No")
-                    time.sleep(2)
-                    break
-        # if role == "member":
-        #     print("""List of datatypes:
-        #                 first_name
-        #                 last_name
-        #                 age
-        #                 gender
-        #                 weight
-        #                 street
-        #                 house_number
-        #                 postal_code
-        #                 city
-        #                 country
-        #                 email
-        #                 phone_number
-        #         """)
-
-        
-        # if role == "member":
-        #     if datatype_to_update == "age":
-        #             loop = True
-        #             while loop:
-        #                 age = input("Enter age: ").strip()
-        #                 loop = validate_age(age)
-        #                 # update member
-        #                 if not loop:
-        #                     cursor.execute("UPDATE Members SET age = ? WHERE user_id = ?", (age, id_to_update))
-        #                     connection.commit()
-        #                     print("Age updated successfully")
-        #                     log_activity(super_username, "Update user", f"Updated age of user with username: {decrypted_name}", "No")
-        #                     time.sleep(2)
-        #                     break
-        #     elif datatype_to_update == "gender":
-        #         loop = True
-        #         while loop:
-        #             gender = input("Enter gender: ").strip().capitalize()
-        #             loop = validate_gender(gender)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET gender = ? WHERE user_id = ?", (gender, id_to_update))
-        #                 connection.commit()
-        #                 print("Gender updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated gender of usre with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "weight":
-        #         loop = True
-        #         while loop:
-        #             weight = input("Enter weight: ").strip()
-        #             loop = validate_weight(weight)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET weight = ? WHERE user_id = ?", (weight, id_to_update))
-        #                 connection.commit()
-        #                 print("Weight updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated weight of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "street":
-        #         loop = True
-        #         while loop:
-        #             street = input("Enter street: ").strip().title()
-        #             loop = validate_street(street)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET street = ? WHERE user_id = ?", (street, id_to_update))
-        #                 connection.commit()
-        #                 print("Street updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated street of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "house_number":
-        #         loop = True
-        #         while loop:
-        #             house_number = input("Enter house number: ").strip()
-        #             loop = validate_house_number(house_number)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET house_number = ? WHERE user_id = ?", (house_number, id_to_update))
-        #                 connection.commit()
-        #                 print("House number updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated house number of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "postal_code":
-        #         loop = True
-        #         while loop:
-        #             postal_code = input("Enter postal code: ").strip()
-        #             loop = validate_postal_code(postal_code)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET postal_code = ? WHERE user_id = ?", (postal_code, id_to_update))
-        #                 connection.commit()
-        #                 print("Postal code updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated postal code of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "city":
-        #         loop = True
-        #         while loop:
-        #             city = input("Enter city: ").strip().capitalize()
-        #             loop = validate_city(city)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET city = ? WHERE user_id = ?", (city, id_to_update))
-        #                 connection.commit()
-        #                 print("City updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated city of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "country":
-        #         loop = True
-        #         while loop:
-        #             country = input("Enter country: ").strip().capitalize()
-        #             loop = validate_country(country)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET country = ? WHERE user_id = ?", (country, id_to_update))
-        #                 connection.commit()
-        #                 print("Country updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated country of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "email":
-        #         loop = True
-        #         while loop:
-        #             email = input("Enter email: ").strip().lower()
-        #             loop = validate_email(email)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET email = ? WHERE user_id = ?", (email, id_to_update))
-        #                 connection.commit()
-        #                 print("Email updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated email of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
-        #     elif datatype_to_update == "phone_number":
-        #         loop = True
-        #         while loop:
-        #             phone_number = input("Enter phone number: ").strip()
-        #             loop = validate_phone_number(phone_number)
-        #             # update member
-        #             if not loop:
-        #                 cursor.execute("UPDATE Members SET phone_number = ? WHERE user_id = ?", (phone_number, id_to_update))
-        #                 connection.commit()
-        #                 print("Phone number updated successfully")
-        #                 log_activity(super_username, "Update user", f"Updated phone number of user with username: {decrypted_name}", "No")
-        #                 time.sleep(2)
-        #                 break
+                return
             else:
-                main.clear()
-                print("Invalid input")
-                log_activity(super_username, "Update user", "Invalid input in modify menu", "No")
-                time.sleep(2)
-                continue
+                member_to_update = show_members(search_results[1:])
+                # choose datatype
+                while True:
+                    main.clear()
+                    print("\n 1. First name")
+                    print(" 2. Last name")
+                    print(" 3. Age")
+                    print(" 4. Gender")
+                    print(" 5. Weight")
+                    print(" 6. Street")
+                    print(" 7. House number")
+                    print(" 8. Postal code")
+                    print(" 9. City")
+                    print("10. Country")
+                    print("11. Email")
+                    print("12. Phone number")
+                    choice = input("Choose the datatype you want to change (1/2/3/4/5/6/7/8/9/10/11/12): ")
+                    if choice == "1":
+                        new_data = input("Enter new first name: ").strip()
+                        if modify_data("first_name", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("First name updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("First name not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "2":
+                        new_data = input("Enter new last name: ").strip()
+                        if modify_data("last_name", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Last name updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Last name not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "3":
+                        new_data = input("Enter new age: ").strip()
+                        if modify_data("age", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Age updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Age not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "4":
+                        new_data = input("Enter new gender: ").strip()
+                        if modify_data("gender", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Gender updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Gender not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "5":
+                        new_data = input("Enter new weight: ").strip()
+                        if modify_data("weight", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Weight updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Weight not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "6":
+                        new_data = input("Enter new street: ").strip()
+                        if modify_data("street", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Street updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Street not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "7":
+                        new_data = input("Enter new house number: ").strip()
+                        if modify_data("house_number", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("House number updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("House number not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "8":
+                        new_data = input("Enter new postal code: ").strip()
+                        if modify_data("postal_code", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Postal code updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Postal code not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "9":
+                        new_data = input("Enter new city: ").strip()
+                        if modify_data("city", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("City updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("City not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "10":
+                        new_data = input("Enter new country: ").strip()
+                        if modify_data("country", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Country updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Country not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "11":
+                        new_data = input("Enter new email: ").strip()
+                        if modify_data("email", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Email updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Email not updated")
+                            time.sleep(2)
+                            break
+                    elif choice == "12":
+                        new_data = input("Enter new phone number: ").strip()
+                        if modify_data("phone_number", "Members", member_to_update, new_data):
+                            main.clear()
+                            print("Phone number updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Phone number not updated")
+                            time.sleep(2)
+                            break
+                    else:
+                        print("Invalid input")
+                        time.sleep(2)
+            return
+            
+        else:
+            main.clear()
+            print("Invalid input")
+            time.sleep(2)
+        
+
+        
 
 def delete_user(role):
     connection = sqlite3.connect("mealmanagement.db")
@@ -675,18 +713,7 @@ def input_and_validate(prompt, validate_func, default_value=""):
         print("Invalid input provided.")
         log_activity("test", "idk", "invalid", "No")
 
-
-def search_member():
-    connection = sqlite3.connect("mealmanagement.db")
-    cursor = connection.cursor()
-
-    main.clear()
-    print("\n--- Retrieve member ---")
-    search = input("Search: ").strip()
-    search = f"%{search}%"
-
-    cursor.execute(f"SELECT * FROM Members WHERE first_name LIKE ? OR member_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR age LIKE ? OR gender LIKE ? OR weight LIKE ? OR street LIKE ? OR house_number LIKE ? OR postal_code LIKE ? OR city LIKE ? OR country LIKE ? OR email LIKE ? OR phone_number LIKE ?", (search, search, search, search, search, search, search, search, search, search, search, search, search, search))
-    members = cursor.fetchall()
+def show_members(members):
     
     # Check if any members are found
     if members == []:
@@ -695,7 +722,7 @@ def search_member():
         time.sleep(2)
         return
 
-    current_member = 0
+    current_member = 1
     # Show user data
     while True:
         main.clear()
@@ -703,35 +730,41 @@ def search_member():
         
         # Show member data
         member.ShowData(members[current_member])
-        
+
         # Show page number and menu
-        print("\n--- page", current_member + 1, "/", len(members), "---")
-        print("1. Next member")
-        print("2. Previous member")
-        print("3. Go back")
-        choice = input("Choose an option (1/2/3): ").strip()
-        if choice == "1":
-            if current_member == len(members) - 1:
+        print("\n--- page", current_member, "/", len(members), "---")
+        print("N. Next member")
+        print("P. Previous member")
+        print("Enter the pagenumber of the member you want to update (or N/P for another member): ")
+        choice = input("Choose an option: ").strip()
+        if choice == "N" or choice == "n":
+            if current_member == len(members):
                 main.clear()
                 print("You have reached the last page")
                 time.sleep(2)
             else:
                 current_member += 1
-        elif choice == "2":
+        elif choice == "P" or choice == "p":
             if current_member == 0:
                 main.clear()
                 print("You are already at the first page")
                 time.sleep(2)
             else:
                 current_member -= 1
-        elif choice == "3":
-            break
         else:
-            main.clear()
-            print("Invalid input")
-            log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
-            time.sleep(2)
-    connection.close()
+            member_to_update = choice
+            try:
+                if int(member_to_update) > len(members):
+                    main.clear()
+                    print("Invalid input")
+                    time.sleep(2)
+                    continue
+                return members[int(member_to_update)][0]
+            except:
+                main.clear()
+                print("Invalid input")
+                time.sleep(2)
+                return
 
 def make_backup(backup_path):
     connection = sqlite3.connect("mealmanagement.db")

@@ -19,9 +19,9 @@ from log_config import *
 from os import system, name
 import time
 
+
 def main():
     # try:
-    database.clear_database()
     database.create_or_connect_db()
     log_activity("System", "Program started", "No", "No") 
     main_menu()
@@ -64,8 +64,10 @@ def Login():
     while attempts < max_attempts:
         clear()
         print("\n--- Login ---")
-        username = input("Enter your username: ")
-        password = getpass("Enter your password: ")
+        # username = input("Enter your username: ")
+        # password = getpass("Enter your password: ")
+        username = "super_admin"
+        password = "Admin_123?"
 
         user_data = []
         for user in data:
