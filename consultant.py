@@ -54,7 +54,7 @@ def menu(username):
                 modify_member(username)
             elif choice == "3":
                 main.clear()
-                search_member("member")
+                search_people("member")
             elif choice == "4":
                 continue
             else:

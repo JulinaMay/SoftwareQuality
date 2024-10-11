@@ -197,8 +197,8 @@ def systemadmin_menu():
         print("\n--- System admin menu ---")
         print("1. Make a new system admin")
         print("2. Modify admin")
-        print("3. Delete a admin")
-        print("4. Reset password of a admin")
+        print("3. Delete an admin")
+        print("4. Reset password of an admin")
         print("5. Go back")
 
         choice = input("Choose an option (1/2/3/4/5): ")
@@ -304,7 +304,7 @@ def member_menu():
             delete_user("member")
         elif choice == "4":
             main.clear()
-            search_member("member")
+            search_people("member")
         elif choice == "5":
             break
         else:
@@ -580,10 +580,10 @@ def delete_user(role):
 
     while True:
         print(f"\n--- Delete {role} ---")
-        id_to_delete = input(f"Enter the id of the {role} you want to delete: ").strip()
+        search_people(role)
 
         choice = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-        if choice == "n":
+        if choice.lower() == "n":
             break
         
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
@@ -714,7 +714,7 @@ def input_and_validate(prompt, validate_func, default_value=""):
         print("Invalid input provided.")
         log_instance.log_activity("System", "Invalid input", "Validation did not pass", "No")
 
-def search_member(role):
+def search_people(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -728,6 +728,16 @@ def search_member(role):
                     return
                 else:
                     show_members(search_results[1:], from_modify=False)
+        elif role == "admin" or role == "consultant":
+            search_term = input("Enter search term: ").strip()
+            search_results = search(search_term, "Users", role)
+            if (len(search_results) == 0):
+                main.clear()
+                print(f"No {role}s found")
+                time.sleep(2)
+                return
+            else:
+                show_members(search_results[1:], from_modify=False)
         else:
             main.clear()
             print("Invalid input")
