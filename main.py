@@ -14,20 +14,23 @@ from getpass import getpass
 from safe_data import *
 
 # logging
-from log_config import *
+from log_config import logmanager as log_manager
+log_instance = log_manager()
+
+from search import *
 
 from os import system, name
 import time
 
 
 def main():
-    # try:
-    database.create_or_connect_db()
-    log_activity("System", "Program started", "No", "No") 
-    main_menu()
-    # except Exception as ex:
-    #     log_activity("System", f"Program crash created at: {ex}", "No", "No")
-    #     return
+    try:
+        log_instance.log_activity("System", "Program started", "No", "No") 
+        database.create_or_connect_db()
+        main_menu()
+    except Exception as ex:
+        log_instance.log_activity("System", f"Program crash created at: {ex}", "No", "No")
+        return
     
     
 def main_menu():
@@ -44,11 +47,11 @@ def main_menu():
             Login()
         elif choice == "2":
             print("Exiting the program. Goodbye!")
-            log_activity("System", "Program exited", "No", "No")
+            log_instance.log_activity("System", "Program exited", "No", "No")
             break
         else:
             print("Invalid input")
-            log_activity("System", "Invalid input in the main menu", "No", "No")
+            log_instance.log_activity("System", "Invalid input in the main menu", "No", "No")
             time.sleep(2)
 
 def Login():
@@ -86,31 +89,32 @@ def Login():
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
                 attempts = 0  # Reset attempts after a successful login
                 if role_level == "consultant":
-                    log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
+                    log_instance.log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (consultant) logged in", "No")
                     consultant.menu(decrypted_username)
                 elif role_level == "admin":
-                    log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
+                    log_instance.log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
                     admin.menu(decrypted_username)
+                    log_instance.see_logs()
                 break  # Exit the loop after a successful login
             else:
                 attempts += 1
                 print("Login failed")
                 if attempts >= max_attempts:
                     print("You have reached the maximum number of login attempts")
-                    log_activity(decrypted_username, "Login failed", "Entered invalid password multiple times", "Yes")
+                    log_instance.log_activity(decrypted_username, "Login failed", "Entered invalid password multiple times", "Yes")
                 else:
-                    log_activity(decrypted_username, "Login failed", "Entered invalid password", "No")
+                    log_instance.log_activity(decrypted_username, "Login failed", "Entered invalid password", "No")
         elif username == super_username and password == super_password:
-            log_activity(super_username, "Login successful", "Super admin logged in", "No")
+            log_instance.log_activity(super_username, "Login successful", "Super admin logged in", "No")
             super_admin.menu()
             break
         else:
             attempts += 1
             if attempts >= max_attempts:
                 print("You have reached the maximum number of login attempts")
-                log_activity(username, "Login failed", "Entered invalid username multiple times", "Yes")
+                log_instance.log_activity(username, "Login failed", "Entered invalid username multiple times", "Yes")
             else:
-                log_activity(username, "Login failed", "Inputted an invalid username", "No")
+                log_instance.log_activity(username, "Login failed", "Inputted an invalid username", "No")
             print("User not found")
 
         time.sleep(2)
