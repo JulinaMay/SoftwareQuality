@@ -4,7 +4,7 @@ import database
 # validation
 
 def validate_first_name(first_name):
-    pattern = r"^[a-zA-Z'-]+$" # A-Z, a-z
+    pattern = r"^[A-Z][a-zA-Z'-]*$" # First letter capital, rest normal
     length = False
     syntax = False
 

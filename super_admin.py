@@ -288,10 +288,9 @@ def member_menu():
         print("1. Make a member")
         print("2. Modify a member")
         print("3. Delete a member")
-        print("4. Search for a member")
-        print("5. Go back")
+        print("4. Go back")
 
-        choice = input("Choose an option (1/2/3/4/5): ")
+        choice = input("Choose an option (1/2/3/4): ")
 
         if choice == "1":
             main.clear()
@@ -303,9 +302,6 @@ def member_menu():
             main.clear()
             delete_user("member")
         elif choice == "4":
-            main.clear()
-            search_people("member")
-        elif choice == "5":
             break
         else:
             print("Invalid input")
@@ -333,8 +329,8 @@ def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> 
     return True
 
 def modify_user(role):
-    connection = sqlite3.connect("mealmanagement.db")
-    cursor = connection.cursor()
+    # connection = sqlite3.connect("mealmanagement.db")
+    # cursor = connection.cursor()
     
     while True:
         main.clear()
@@ -371,34 +367,49 @@ def modify_user(role):
                 print(" 3. Last name")
                 choice = input("\nChoose the datatype you want to change (1/2/3): ")
                 if choice == "1":
-                    new_data = input("\nEnter new username: ").strip()
-                    if modify_data("username", "Users", selected_result[0], new_data):
-                        main.clear()
-                        print("Username updated successfully")
-                        time.sleep(2)
-                        break
+                    new_data = input("Enter new username: ").strip()
+                    if validate_username(new_data):
+                        if modify_data("username", "Users", selected_result[0], new_data):
+                            main.clear()
+                            print("Username updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Username not updated")
+                            break
                     else:
-                        print("Username not updated")
+                        print("Invalid input")
+                        time.sleep(2)
                         break
                 elif choice == "2":
-                    new_data = input("\nEnter new first name: ").strip()
-                    if modify_data("first_name", "Users", selected_result[0], new_data):
-                        main.clear()
-                        print("First name updated successfully")
+                    new_first_name = input("Enter new first name: ").strip()
+                    if validate_first_name(new_first_name):
+                        if modify_data("first_name", "Users", selected_result[0], new_first_name):
+                            main.clear()
+                            print("First name updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("First name not updated")
+                            break 
+                    else:
+                        print("Invalid input")
                         time.sleep(2)
                         break
-                    else:
-                        print("First name not updated")
-                        break 
                 elif choice == "3":
-                    new_data = input("\nEnter new last name: ").strip()
-                    if modify_data("last_name", "Users", selected_result[0], new_data):
-                        main.clear()
-                        print("Last name updated successfully")
-                        time.sleep(2)
-                        break
+                    new_data = input("Enter new last name: ").strip()
+                    if validate_last_name(new_data):
+                        if modify_data("last_name", "Users", selected_result[0], new_data):
+                            main.clear()
+                            print("Last name updated successfully")
+                            time.sleep(2)
+                            break
+                        else:
+                            print("Last name not updated")
+                            break
                     else:
-                        print("Last name not updated")
+                        print("Invalid input")
+                        time.sleep(2)
                         break
                 else:
                     print("Invalid input")
@@ -434,134 +445,194 @@ def modify_user(role):
                     choice = input("Choose the datatype you want to change (1/2/3/4/5/6/7/8/9/10/11/12): ")
                     if choice == "1":
                         new_data = input("Enter new first name: ").strip()
-                        if modify_data("first_name", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("First name updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_first_name(new_data):
+                            if modify_data("first_name", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("First name updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("First name not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("First name not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "2":
                         new_data = input("Enter new last name: ").strip()
-                        if modify_data("last_name", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Last name updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_last_name(new_data):
+                            if modify_data("last_name", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Last name updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Last name not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Last name not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "3":
                         new_data = input("Enter new age: ").strip()
-                        if modify_data("age", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Age updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_age(new_data):
+                            if modify_data("age", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Age updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Age not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Age not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "4":
                         new_data = input("Enter new gender: ").strip()
-                        if modify_data("gender", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Gender updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_gender(new_data):
+                            if modify_data("gender", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Gender updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Gender not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Gender not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "5":
                         new_data = input("Enter new weight: ").strip()
-                        if modify_data("weight", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Weight updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_weight(new_data):
+                            if modify_data("weight", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Weight updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Weight not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Weight not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "6":
                         new_data = input("Enter new street: ").strip()
-                        if modify_data("street", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Street updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_street(new_data):
+                            if modify_data("street", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Street updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Street not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Street not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "7":
                         new_data = input("Enter new house number: ").strip()
-                        if modify_data("house_number", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("House number updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_house_number(new_data):
+                            if modify_data("house_number", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("House number updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("House number not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("House number not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "8":
                         new_data = input("Enter new postal code: ").strip()
-                        if modify_data("postal_code", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Postal code updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_postal_code(new_data):
+                            if modify_data("postal_code", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Postal code updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Postal code not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Postal code not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "9":
                         new_data = input("Enter new city: ").strip()
-                        if modify_data("city", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("City updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_city(new_data):
+                            if modify_data("city", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("City updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("City not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("City not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "10":
                         new_data = input("Enter new country: ").strip()
-                        if modify_data("country", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Country updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_country(new_data):
+                            if modify_data("country", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Country updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Country not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Country not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "11":
                         new_data = input("Enter new email: ").strip()
-                        if modify_data("email", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Email updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_email(new_data):
+                            if modify_data("email", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Email updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Email not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Email not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     elif choice == "12":
                         new_data = input("Enter new phone number: ").strip()
-                        if modify_data("phone_number", "Members", member_to_update, new_data):
-                            main.clear()
-                            print("Phone number updated successfully")
-                            time.sleep(2)
-                            break
+                        if validate_phone_number(new_data):
+                            if modify_data("phone_number", "Members", member_to_update, new_data):
+                                main.clear()
+                                print("Phone number updated successfully")
+                                time.sleep(2)
+                                break
+                            else:
+                                print("Phone number not updated")
+                                time.sleep(2)
+                                break
                         else:
-                            print("Phone number not updated")
+                            print("Invalid input")
                             time.sleep(2)
                             break
                     else:
@@ -573,7 +644,7 @@ def modify_user(role):
             main.clear()
             print("Invalid input")
             time.sleep(2)
-              
+        
 def delete_user(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
