@@ -5,7 +5,7 @@ log_instance = log_manager()
 
 def ShowData(member):
     print(f"> Name:         {member[2]} {member[3]}")
-    print(f"> Member ID:    {member[1]}")
+    print(f"> Member ID:    {member[0]}")
     print(f"> Age:          {member[4]}")
     print(f"> Gender:       {member[5]}")
     print(f"> Weight:       {member[6]}")
