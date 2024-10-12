@@ -219,7 +219,7 @@ def systemadmin_menu():
             main.clear()
             reset_pw("admin")
         elif choice == "5":
-            break
+            break # this opens the logs??
         else:
             print("Invalid input")
             log_instance.log_activity(super_username, "System", "Invalid input in the admin menu", "No")
@@ -329,9 +329,6 @@ def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> 
     return True
 
 def modify_user(role):
-    # connection = sqlite3.connect("mealmanagement.db")
-    # cursor = connection.cursor()
-    
     while True:
         main.clear()
         print("\n--- Update user ---")
@@ -651,12 +648,30 @@ def delete_user(role):
 
     while True:
         print(f"\n--- Delete {role} ---")
-        search_people(role)
+        search_results = search_people(role)
 
-        choice = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-        if choice.lower() == "n":
+        # Choose user to delete
+        choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
+        if choice == "0":
+            break
+        try:
+            choice = int(choice)
+            if choice < 1 or choice > len(search_results):
+                print("Invalid choice. Please select a valid number.")
+                time.sleep(2)
+                continue
+        except ValueError:
+            print("Please enter a number.")
+            time.sleep(2)
+            continue
+
+        # Confirm deletion
+        choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
+        if choice_two.lower() == "n":
             break
         
+        # Delete user
+        id_to_delete = search_results[choice][0]
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
         user = cursor.fetchall()
         decrypted_name = decrypt_data(private_key(), user[0][1])
@@ -808,7 +823,8 @@ def search_people(role):
                 time.sleep(2)
                 return
             else:
-                show_members(search_results[1:], from_modify=False)
+                display_search_results(search_results)
+                return search_results
         else:
             main.clear()
             print("Invalid input")
@@ -872,7 +888,6 @@ def show_members(members, from_modify=False):
                 print("Invalid input")
                 time.sleep(2)
                 return
-
 
 def make_backup(backup_path):
     connection = sqlite3.connect("mealmanagement.db")
