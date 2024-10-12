@@ -38,11 +38,11 @@ def menu(username):
             update_password(username)
         elif choice == "2":
             main.clear()
-            print("\n--- Members Menu ---")
+            print("\n--- Members Menu (from consultant) ---")
 
             print("1. Process member request")
             print("2. Modify member")
-            print("3. Retrieve member")
+            print("3. Delete member")
             print("4. Go back")
             choice = input("Choose an option (1/2/3/4): ").strip()
 
@@ -51,10 +51,10 @@ def menu(username):
                 add_member()
             elif choice == "2":
                 main.clear()
-                modify_member(username)
+                modify_user("member")
             elif choice == "3":
                 main.clear()
-                search_people("member")
+                delete_user("member")
             elif choice == "4":
                 continue
             else:
@@ -139,37 +139,3 @@ def update_password(username): # TODO: Add validation
                 time.sleep(2)
                 break
         return True
-
-def modify_member(username):
-    connection = sqlite3.connect("mealmanagement.db")
-    cursor = connection.cursor()
-
-    while True:
-        main.clear()
-        print("\n--- Modify Member ---")
-        print("1. Add a member")
-        print("2. Modify a member")
-        print("3. Search for a member")
-        print("4. Go back")
-        choice = input("Choose an option (1/2/3/4): ").strip()
-
-        # Update member
-        if choice == "1":
-            main.clear()
-            add_member("member")
-        # Go back
-        elif choice == "2":
-            main.clear()
-            modify_user("member")
-        elif choice == "3":
-            main.clear()
-            search_member("member")
-        elif choice == "4":
-            break
-        # Invalid input
-        else:
-            main.clear()
-            log_instance.log_activity(username, "System", "Invalid input at the modifying menu", "No")
-            time.sleep(2)
-
-    connection.close()

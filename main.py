@@ -71,8 +71,18 @@ def Login():
         print("\n--- Login ---")
         # username = input("Enter your username: ")
         # password = getpass("Enter your password: ")
-        username = "super_admin"
-        password = "Admin_123?"
+
+        # SUPER ADMIN
+        # username = "super_admin"
+        # password = "Admin_123?"
+
+        # ADMIN
+        # username = "admin"
+        # password = "Admin_123?"
+
+        # CONSULTANT
+        username = "consultant"
+        password = "Consultant_123?"
 
         user_data = []
         for user in data:

@@ -5,6 +5,8 @@ import sqlite3
 import main
 import member
 import user
+from consultant import * 
+import consultant 
 # Validation
 from validation import *
 
@@ -279,15 +281,15 @@ def system_menu():
         connection.close()
 
 # Member menu
-def member_menu():
+def member_menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
         main.clear()
         print("\n--- Member menu ---")
-        print("1. Make a member")
-        print("2. Modify a member")
-        print("3. Delete a member")
+        print("1. Process member request")
+        print("2. Modify member")
+        print("3. Delete member")
         print("4. Go back")
 
         choice = input("Choose an option (1/2/3/4): ")
