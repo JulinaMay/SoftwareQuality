@@ -646,7 +646,7 @@ def modify_user(role):
             main.clear()
             print("Invalid input")
             time.sleep(2)
-        
+
 def delete_user(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
@@ -655,29 +655,20 @@ def delete_user(role):
         print(f"\n--- Delete {role} ---")
         search_results = search_people(role)
 
-        if not search_results:
-            print("No users found")
-            time.sleep(2)
-            break
-
-        id_to_delete = show_members(search_results, from_modify=False)
-        if id_to_delete is None:
-            break
-
         # Choose user to delete
-        # choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
-        # if choice == "0":
-        #     break
-        #try:
-        #     choice = int(choice)
-        #     if choice < 1 or choice > len(search_results):
-        #         print("Invalid choice. Please select a valid number.")
-        #         time.sleep(2)
-        #         continue
-        # except ValueError:
-        #     print("Please enter a number.")
-        #     time.sleep(2)
-        #     continue
+        choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
+        if choice == "0":
+            break
+        try:
+            choice = int(choice)
+            if choice < 1 or choice > len(search_results):
+                print("Invalid choice. Please select a valid number.")
+                time.sleep(2)
+                continue
+        except ValueError:
+            print("Please enter a number.")
+            time.sleep(2)
+            continue
 
         # Confirm deletion
         choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
@@ -685,33 +676,23 @@ def delete_user(role):
             break
         
         # Delete user
-        # id_to_delete = search_results[choice][0]
-        
-        if role == "member":
-            cursor.execute("SELECT * FROM Members WHERE member_id =?", (id_to_delete,))
-        else:
-            cursor.execute("SELECT * FROM Users WHERE id = ? AND role = ?", (id_to_delete, role))
-        
-        user = cursor.fetchone()
+        id_to_delete = search_results[choice][0]
+        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
+        user = cursor.fetchall()
+        decrypted_name = decrypt_data(private_key(), user[0][1])
 
-        if not user:
+        if user == []:
             main.clear()
             print("User not found")
             time.sleep(2)
             break
         else:
-            if role == "member":
-                cursor.execute("DELETE * FROM Members WHERE member_id =?", (id_to_delete,))
-            else:
-                cursor.execute("DELETE FROM Users WHERE id = ? AND role =?", (id_to_delete, role))
-            
+            cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
             connection.commit()
-            decrypted_name = decrypt_data(private_key(), user[1])
             print(f"{role} deleted successfully")
             log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
             time.sleep(2)
             break
-    connection.close()
 
 def reset_pw(role):
     main.clear()
