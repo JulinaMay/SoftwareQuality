@@ -49,6 +49,18 @@ def main_menu():
             Login()
         elif choice == "2":
             print("Exiting the program. Goodbye!")
+
+            print(            '''
+          ___
+        .'o O'-._
+       / O o_.-`|
+      /O_.-'  O |
+      | o   o .-`
+      |o O_.-'
+      '--`
+                  
+made by: JMM HJS
+            ''')
             log_instance.log_activity("System", "Program exited", "No", "No")
             break
         else:
@@ -72,17 +84,7 @@ def Login():
         username = input("Enter your username: ")
         password = getpass("Enter your password: ")
 
-        # SUPER ADMIN
-        # username = "super_admin"
-        # password = "Admin_123?"
-
-        # ADMIN
-        # username = "admin"
-        # password = "Admin_123?"
-
-        # CONSULTANT
-        # username = "consultant"
-        # password = "Consultant_123?"
+     
 
         user_data = []
         for user in data:

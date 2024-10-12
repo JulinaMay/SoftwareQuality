@@ -655,44 +655,63 @@ def delete_user(role):
         print(f"\n--- Delete {role} ---")
         search_results = search_people(role)
 
-        # Choose user to delete
-        choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
-        if choice == "0":
-            break
-        try:
-            choice = int(choice)
-            if choice < 1 or choice > len(search_results):
-                print("Invalid choice. Please select a valid number.")
-                time.sleep(2)
-                continue
-        except ValueError:
-            print("Please enter a number.")
-            time.sleep(2)
-            continue
+        if role == "member":
+            # if user id == empty then break
+            if search_results == None:
+                break
+            # Confirm deletion
+            choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
+            if choice_two.lower() == "n":
+                break
 
-        # Confirm deletion
-        choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-        if choice_two.lower() == "n":
-            break
-        
-        # Delete user
-        id_to_delete = search_results[choice][0]
-        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
-        user = cursor.fetchall()
-        decrypted_name = decrypt_data(private_key(), user[0][1])
-
-        if user == []:
-            main.clear()
-            print("User not found")
-            time.sleep(2)
-            break
-        else:
-            cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
+            cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
             connection.commit()
             print(f"{role} deleted successfully")
-            log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
+            log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {search_results}", "No")
             time.sleep(2)
             break
+
+
+        else:
+            # Choose user to delete
+            choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
+            if choice == "0":
+                break
+            try:
+                choice = int(choice)
+                if choice < 1 or choice > len(search_results):
+                    print("Invalid choice. Please select a valid number.")
+                    time.sleep(2)
+                    continue
+            except ValueError:
+                print("Please enter a number.")
+                time.sleep(2)
+                continue
+
+            # Confirm deletion
+            choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
+            if choice_two.lower() == "n":
+                break
+            
+            # Delete user
+
+            id_to_delete = search_results[choice][0]
+            cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
+            user = cursor.fetchall()
+            decrypted_name = decrypt_data(private_key(), user[0][1])
+
+            if user == []:
+                main.clear()
+                print("User not found")
+                time.sleep(2)
+                break
+            else:
+                cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
+                connection.commit()
+                print(f"{role} deleted successfully")
+                log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
+                time.sleep(2)
+                break
 
 def reset_pw(role):
     main.clear()
@@ -732,18 +751,18 @@ def add_member():
     print("\n--- Process member Request ---")
 
     # Input and validation
-    first_name = input_and_validate("Enter first name: ", validate_first_name, "Karlijn")
-    last_name = input_and_validate("Enter last name: ", validate_last_name, "hofman")
-    age = input_and_validate("Enter age: ", validate_age, "19")
-    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender, "Male")
-    weight = input_and_validate("Enter weight (kg): ", validate_weight, "80")
-    street = input_and_validate("Enter street: ", validate_street, "abc")
-    house_number = input_and_validate("Enter house number: ", validate_house_number, "99")
-    postal_code = input_and_validate("Enter postal code: ", validate_postal_code, "1234AB")
-    city = input_and_validate("Enter city: ", validate_city, "Rotterdam")
-    country = input_and_validate("Enter country: ", validate_country, "Nederland")
-    email = input_and_validate("Enter email: ", validate_email, "karlijn@gmail.com")
-    phone_number = input_and_validate("Enter phone number: ", validate_phone_number, "+31 6 12345678")
+    first_name = input_and_validate("Enter first name: ", validate_first_name)
+    last_name = input_and_validate("Enter last name: ", validate_last_name)
+    age = input_and_validate("Enter age: ", validate_age)
+    gender = input_and_validate("Enter gender (Male, Female, Neither): ", validate_gender)
+    weight = input_and_validate("Enter weight (kg): ", validate_weight)
+    street = input_and_validate("Enter street: ", validate_street)
+    house_number = input_and_validate("Enter house number: ", validate_house_number)
+    postal_code = input_and_validate("Enter postal code: ", validate_postal_code)
+    city = input_and_validate("Enter city: ", validate_city)
+    country = input_and_validate("Enter country: ", validate_country)
+    email = input_and_validate("Enter email: ", validate_email)
+    phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
     
     #  Create unique member_id
     current_date = str(datetime.now().year)
@@ -818,9 +837,9 @@ def search_people(role):
                 time.sleep(2)
                 return None
             else:
-                show_members(search_results[1:], from_modify=False)
+                id_to_update = show_members(search_results[1:], from_modify=False)
                 input("Press enter to continue..")
-                return search_results
+                return id_to_update
     elif role in ["admin", "consultant"]:
         search_results = search(search_term, "Users", role)
         if not search_results:
