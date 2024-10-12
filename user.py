@@ -1,8 +1,12 @@
 import sqlite3
 
+import time
+
 import bcrypt
 from getpass import getpass
 from safe_data import *
+
+from validation import *
 
 import main
 
@@ -14,7 +18,17 @@ def create_account(role):
     while True:
         main.clear()
         print("\n--- Create Account ---")
-        userName = input("Enter a username: ")
+
+        # input username
+        while True:
+            main.clear()
+            userName = input("Enter a username: ")
+            if validate_username(userName):
+                break
+            else:
+                print("Invalid username. Please try again.")
+                time.sleep(2)
+                log_instance.log_activity(f"", "Create account failed", "Invalid username", "No")
 
         connection = sqlite3.connect("mealmanagement.db")
         cursor = connection.cursor()
@@ -26,9 +40,39 @@ def create_account(role):
             connection.close()
             continue
         
-        password = getpass("Enter a password: ")
-        firstName = input("Enter your first name: ").strip()
-        lastName = input("Enter your last name: ").strip()
+        # input password
+        while True:
+            main.clear()
+            password = getpass("Enter a password: ")
+            if validate_password(password):
+                break
+            else:
+                print("Invalid password. Please try again.")
+                time.sleep(2)
+                log_instance.log_activity("", "Create account failed", "Invalid password", "No")
+
+        # input first name
+        while True:
+            main.clear()
+            firstName = input("Enter your first name: ").strip()
+            if validate_first_name(firstName):
+                break
+            else:
+                print("Invalid first name. Please try again.")
+                time.sleep(2)
+                log_instance.log_activity("", "Create account failed", "Invalid first name", "No")
+
+        # input last name
+        while True:
+            main.clear()
+            lastName = input("Enter your last name: ").strip()
+            if validate_last_name(lastName):
+                break
+            else:
+                print("Invalid last name. Please try again.")
+                time.sleep(2)
+                log_instance.log_activity("", "Create account failed", "Invalid last name", "No")
+
         if role == "member":
             roleLevel = "member"
         elif role == "consultant":
