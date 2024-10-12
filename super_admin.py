@@ -281,7 +281,7 @@ def system_menu():
         connection.close()
 
 # Member menu
-def member_menu(username):
+def member_menu():
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -290,9 +290,10 @@ def member_menu(username):
         print("1. Process member request")
         print("2. Modify member")
         print("3. Delete member")
-        print("4. Go back")
+        print("4. Search member")
+        print("5. Go back")
 
-        choice = input("Choose an option (1/2/3/4): ")
+        choice = input("Choose an option (1/2/3/4/5): ")
 
         if choice == "1":
             main.clear()
@@ -304,6 +305,8 @@ def member_menu(username):
             main.clear()
             delete_user("member")
         elif choice == "4":
+            search_people("member")
+        elif choice == "5":
             break
         else:
             print("Invalid input")
@@ -652,20 +655,29 @@ def delete_user(role):
         print(f"\n--- Delete {role} ---")
         search_results = search_people(role)
 
-        # Choose user to delete
-        choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
-        if choice == "0":
-            break
-        try:
-            choice = int(choice)
-            if choice < 1 or choice > len(search_results):
-                print("Invalid choice. Please select a valid number.")
-                time.sleep(2)
-                continue
-        except ValueError:
-            print("Please enter a number.")
+        if not search_results:
+            print("No users found")
             time.sleep(2)
-            continue
+            break
+
+        id_to_delete = show_members(search_results, from_modify=False)
+        if id_to_delete is None:
+            break
+
+        # Choose user to delete
+        # choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
+        # if choice == "0":
+        #     break
+        #try:
+        #     choice = int(choice)
+        #     if choice < 1 or choice > len(search_results):
+        #         print("Invalid choice. Please select a valid number.")
+        #         time.sleep(2)
+        #         continue
+        # except ValueError:
+        #     print("Please enter a number.")
+        #     time.sleep(2)
+        #     continue
 
         # Confirm deletion
         choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
@@ -673,23 +685,33 @@ def delete_user(role):
             break
         
         # Delete user
-        id_to_delete = search_results[choice][0]
-        cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
-        user = cursor.fetchall()
-        decrypted_name = decrypt_data(private_key(), user[0][1])
+        # id_to_delete = search_results[choice][0]
+        
+        if role == "member":
+            cursor.execute("SELECT * FROM Members WHERE member_id =?", (id_to_delete,))
+        else:
+            cursor.execute("SELECT * FROM Users WHERE id = ? AND role = ?", (id_to_delete, role))
+        
+        user = cursor.fetchone()
 
-        if user == []:
+        if not user:
             main.clear()
             print("User not found")
             time.sleep(2)
             break
         else:
-            cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
+            if role == "member":
+                cursor.execute("DELETE * FROM Members WHERE member_id =?", (id_to_delete,))
+            else:
+                cursor.execute("DELETE FROM Users WHERE id = ? AND role =?", (id_to_delete, role))
+            
             connection.commit()
+            decrypted_name = decrypt_data(private_key(), user[1])
             print(f"{role} deleted successfully")
             log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
             time.sleep(2)
             break
+    connection.close()
 
 def reset_pw(role):
     main.clear()
@@ -805,41 +827,43 @@ def input_and_validate(prompt, validate_func, default_value=""):
 def search_people(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
-    while True:
-        if role == "member":
-                search_term = input("Enter search term: ").strip()
-                search_results = search(search_term, "Members")
-                if (len(search_results) == 0):
-                    main.clear()
-                    print("No members found")
-                    time.sleep(2)
-                    return
-                else:
-                    show_members(search_results[1:], from_modify=False)
-        elif role == "admin" or role == "consultant":
-            search_term = input("Enter search term: ").strip()
-            search_results = search(search_term, "Users", role)
-            if (len(search_results) == 0):
-                main.clear()
-                print(f"No {role}s found")
+
+    search_term = input("Enter search term: ").strip()
+    
+    if role == "member":
+            search_results = search(search_term, "Members")
+            if not search_results:
+                print("No members found")
                 time.sleep(2)
-                return
+                return None
             else:
-                display_search_results(search_results)
+                show_members(search_results[1:], from_modify=False)
+                input("Press enter to continue..")
                 return search_results
-        else:
-            main.clear()
-            print("Invalid input")
+    elif role in ["admin", "consultant"]:
+        search_results = search(search_term, "Users", role)
+        if not search_results:
+            print(f"No {role}s found")
             time.sleep(2)
+            return None
+        else:
+            display_search_results(search_results)
+            input("Press enter to continue..")
+            return search_results
+    else:
+        main.clear()
+        print("Invalid input")
+        time.sleep(2)
+        return None
 
 def show_members(members, from_modify=False):
     
     # Check if any members are found
-    if members == []:
+    if not members:
         main.clear()
         print("No members found")
         time.sleep(2)
-        return
+        return None
 
     current_member = 0
     # Show user data
@@ -855,9 +879,12 @@ def show_members(members, from_modify=False):
         print("N. Next member")
         print("P. Previous member")
         print("B. Go back")
+
         if from_modify:
             print("\nEnter the pagenumber of the member you want to update (or N/P for another member): ")
+        
         choice = input("Choose an option: ").strip()
+        
         if choice.lower() == "n" or choice.lower() == "no":
             if current_member == len(members) - 1:
                 main.clear()
@@ -873,9 +900,9 @@ def show_members(members, from_modify=False):
             else:
                 current_member -= 1
         elif choice.lower() == "b":
-            member_menu()
+            return None
         else:
-            member_to_update = choice
+            # member_to_update = choice
             try:
                 member_to_update = int(choice) - 1
                 if member_to_update < 0 or member_to_update >= len(members):
@@ -884,12 +911,12 @@ def show_members(members, from_modify=False):
                     log_instance.log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
                     time.sleep(2)
                     continue
-                return members[int(member_to_update)][0]
-            except:
+                return members[member_to_update][0]
+            except ValueError:
                 main.clear()
                 print("Invalid input")
                 time.sleep(2)
-                return
+                return None
 
 def make_backup(backup_path):
     connection = sqlite3.connect("mealmanagement.db")

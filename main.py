@@ -69,8 +69,8 @@ def Login():
     while attempts < max_attempts:
         clear()
         print("\n--- Login ---")
-        # username = input("Enter your username: ")
-        # password = getpass("Enter your password: ")
+        username = input("Enter your username: ")
+        password = getpass("Enter your password: ")
 
         # SUPER ADMIN
         # username = "super_admin"
@@ -81,8 +81,8 @@ def Login():
         # password = "Admin_123?"
 
         # CONSULTANT
-        username = "consultant"
-        password = "Consultant_123?"
+        # username = "consultant"
+        # password = "Consultant_123?"
 
         user_data = []
         for user in data:
