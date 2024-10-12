@@ -15,7 +15,7 @@ display_search_results(search_results)
 -----------------------------------------------------
 '''
 
-def search(search_term, table, column="*"):
+def search(search_term, table, column="*", role=None):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
@@ -40,7 +40,13 @@ def search(search_term, table, column="*"):
     else: 
         columns_to_query = column
     
-    cursor.execute(f"SELECT {columns_to_query} FROM {table}")
+    if role:
+        query = f"SELECT {columns_to_query} FROM {table} WHERE role = ?"
+        cursor.execute(query, (role,))
+    else:
+        query = f"SELECT {columns_to_query} FROM {table}"
+        cursor.execute(query)
+        
     all_data = cursor.fetchall()
     search_results = []
 

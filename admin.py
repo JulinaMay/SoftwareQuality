@@ -10,7 +10,8 @@ import main
 from super_admin import *
 
 # logging
-from log_config import *
+from log_config import logmanager as log_manager
+log_instance = log_manager()
 
 def menu(username):
     main.clear()
@@ -21,9 +22,9 @@ def menu(username):
     user_data = cursor.fetchone()
 
     while True:
-        print(f"Welcome {username}")
         print("\n--- System Admin Menu ---")
-
+        print(f"--Welcome {username}--\n")
+        log_instance.show_notifications()
     #Eigen gegevens
         print("1. Update password")
     #List van users
@@ -63,11 +64,11 @@ def menu(username):
             member_menu()
         elif choice == "6":
             print("You logged out, Goodbye!")
-            log_activity(username, "System", "Program exited", "No")
+            log_instance.log_activity(username, "System", "Program exited", "No")
             break
         else:
             main.clear()
-            log_activity(username, "System", "Invalid input at the modifying menu", "No")
+            log_instance.log_activity(username, "System", "Invalid input at the modifying menu", "No")
             time.sleep(2)
 
 # Functies
@@ -91,13 +92,13 @@ def update_password(username): # TODO: Add validation
         # check if have reached end of loop
         if i == len(user_data) - 1:
             print("User not found")
-            log_activity(username, "Update password" "Nonexistent consultant tried to update password", "Yes")
+            log_instance.log_activity(username, "Update password" "Nonexistent consultant tried to update password", "Yes")
             exit()
             
     # Check if password is correct
     input_password = getpass("Enter your current password: ")
     if not bcrypt.checkpw(input_password.encode('utf-8'), found_password):
-        log_activity(username, "Update password" "Incorrect password", "No")
+        log_instance.log_activity(username, "Update password" "Incorrect password", "No")
         return False
     else:
         while True:
@@ -107,13 +108,13 @@ def update_password(username): # TODO: Add validation
             if (new_password == input_password):
                 main.clear()
                 print("Invalid password")
-                log_activity(username, "Update password", "Entered same password as the old password", "No")
+                log_instance.log_activity(username, "Update password", "Entered same password as the old password", "No")
                 time.sleep(2)
                 continue
             elif (not validate_password(new_password)):
                 main.clear()
                 print("Invalid password")
-                log_activity(username, "Update password", "Invalid password", "No")
+                log_instance.log_activity(username, "Update password", "Invalid password", "No")
                 time.sleep(2)
                 continue
             else:
@@ -136,7 +137,7 @@ def update_password(username): # TODO: Add validation
                 connection.close()
                 main.clear()
                 print("Password updated successfully")
-                log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
+                log_instance.log_activity(username, "Update password" f"Password updated successfully for user: '{username}'", "No")
                 time.sleep(2)
                 break
         return True

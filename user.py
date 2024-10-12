@@ -7,7 +7,8 @@ from safe_data import *
 import main
 
 # logging.
-from log_config import *
+from log_config import logmanager as log_manager
+log_instance = log_manager()
 
 def create_account(role):
     while True:
@@ -21,7 +22,7 @@ def create_account(role):
         cursor.execute("SELECT username FROM Users Where username =?", (userName,))
         if cursor.fetchone():
             print("Username already exists. Please choose another username.")
-            log_activity("", "Create account failed", "Entered already existing username", "No")
+            log_instance.log_activity("", "Create account failed", "Entered already existing username", "No")
             connection.close()
             continue
         
@@ -51,6 +52,5 @@ def create_account(role):
         connection.commit()
 
         connection.close()
-        print("Account created successfully!")
-        log_activity("", "Acount created", f"Account created successfully with the username: '{userName}'", "No")
+        log_instance.log_activity("", "Acount created", f"Account created successfully with the username: '{userName}'", "No")
         break

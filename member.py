@@ -1,6 +1,7 @@
 from safe_data import (decrypt_data, private_key)
 # logging.
-from log_config import logger
+from log_config import logmanager as log_manager
+log_instance = log_manager()
 
 def ShowData(member):
     print(f"> Name:         {member[2]} {member[3]}")

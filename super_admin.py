@@ -9,7 +9,8 @@ import user
 from validation import *
 
 # Logging
-from log_config import *
+from log_config import logmanager as log_manager
+log_instance = log_manager()
 
 # cryptography and hashing
 import bcrypt
@@ -34,12 +35,12 @@ def menu():
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
-    main.clear()
-    print(f"Welcome super admin!")
-    print("\n--- Super Admin Menu ---")
     #List van users
     while True:
         main.clear()
+        log_instance.show_notifications()
+        print("\n--- Super Admin Menu ---")
+        print(f"--Welcome super admin--\n")
     #List van users
         print("1. List of users")
 
@@ -66,7 +67,7 @@ def menu():
     #Search, retriev info of member
         print("5. Member menu")
         print("6. Logout")
-        choice = input("Choose an option (1/2/3/4/5): ").strip()
+        choice = input("Choose an option (1/2/3/4/5/6): ").strip()
 
         if choice == "1":
             main.clear()
@@ -85,11 +86,11 @@ def menu():
             member_menu()
         elif choice == "6":
             print("You logged out, Goodbye!")
-            log_activity(super_username, "System", "Program exited", "No")
+            log_instance.log_activity(super_username, "System", "Program exited", "No")
             break
         else:
             print("Invalid input")
-            log_activity(super_username, "System", "Invalid input in the main menu", "No")
+            log_instance.log_activity(super_username, "System", "Invalid input in the main menu", "No")
             time.sleep(2)
             connection.close()
 
@@ -149,7 +150,7 @@ def list_users():
             break
         else:
             print("Invalid input")
-            log_activity(super_username, "List of users", "Invalid input in the list of users", "No")
+            log_instance.log_activity(super_username, "List of users", "Invalid input in the list of users", "No")
             continue
     
     connection.close()
@@ -167,13 +168,13 @@ def consultant_menu():
         print("4. Reset password of a consultant")
         print("5. Go back")
 
-        choice = input("Choose an option (1/2/3/4/5/6): ")
+        choice = input("Choose an option (1/2/3/4/5): ")
         
         if choice == "1":
             print("Make a new consultant")
             user.create_account("consultant")
             print("\nAdded a new consultant")
-            log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
+            log_instance.log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
@@ -196,17 +197,17 @@ def systemadmin_menu():
         print("\n--- System admin menu ---")
         print("1. Make a new system admin")
         print("2. Modify admin")
-        print("3. Delete a admin")
-        print("4. Reset password of a admin")
+        print("3. Delete an admin")
+        print("4. Reset password of an admin")
         print("5. Go back")
 
-        choice = input("Choose an option (1/2/3/4/5/6): ")
+        choice = input("Choose an option (1/2/3/4/5): ")
 
         if choice == "1":
             print("Make a new system admin")
             user.create_account("admin")
             print("\nAdded a new admin")
-            log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
+            log_instance.log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
@@ -221,7 +222,7 @@ def systemadmin_menu():
             break
         else:
             print("Invalid input")
-            log_activity(super_username, "System", "Invalid input in the admin menu", "No")
+            log_instance.log_activity(super_username, "System", "Invalid input in the admin menu", "No")
             connection.close()
 
 # System menu
@@ -252,7 +253,7 @@ def system_menu():
             # create_zip(backup_path, zip_path)
             create_zip(backup_path, log_dir, zip_path)
             print("Backup created")
-            log_activity(super_username, "System", "Backup created", "No")
+            log_instance.log_activity(super_username, "System", "Backup created", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
@@ -260,20 +261,20 @@ def system_menu():
             choice = input("Choose an option (yes/no): ").strip().lower()
             if choice == "y" or choice == "yes":
                 restore_backup(db_path, zip_path)
-                log_activity(super_username, "System", "Backup restored", "No")
+                log_instance.log_activity(super_username, "System", "Backup restored", "No")
             else:
                 print("Action cancelled")
-                log_activity(super_username, "System", "Backup restore cancelled", "No")
+                log_instance.log_activity(super_username, "System", "Backup restore cancelled", "No")
                 time.sleep(2)
         elif choice == "3":
             date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
             main.clear()
-            see_logs(date)
+            log_instance.see_logs(date)
         elif choice == "4":
             break
         else:
             print("Invalid input")
-            log_activity(super_username, "System", "Invalid input in the system menu", "No")
+            log_instance.log_activity(super_username, "System", "Invalid input in the system menu", "No")
             time.sleep(2)
         connection.close()
 
@@ -304,7 +305,7 @@ def member_menu():
             break
         else:
             print("Invalid input")
-            log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
+            log_instance.log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
 
 def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> bool:
@@ -354,14 +355,17 @@ def modify_user(role):
                 else:
                     print("Invalid choice. Please select a valid number.")
                     input("Press enter to continue")
+                    continue
             except ValueError:
                 print("Please enter a number.")
+                input("Press enter to continue.")
+                continue
             
             while True:
                 print("\n 1. Username")
                 print(" 2. First name")
                 print(" 3. Last name")
-                choice = input("Choose the datatype you want to change (1/2/3): ")
+                choice = input("\nChoose the datatype you want to change (1/2/3): ")
                 if choice == "1":
                     new_data = input("Enter new username: ").strip()
                     if validate_username(new_data):
@@ -410,7 +414,7 @@ def modify_user(role):
                 else:
                     print("Invalid input")
                     time.sleep(2)
-                    return
+                    continue
         
         # Search for member
         elif role == "member":
@@ -422,7 +426,7 @@ def modify_user(role):
                 time.sleep(2)
                 return
             else:
-                member_to_update = show_members(search_results[1:])
+                member_to_update = show_members(search_results[1:], from_modify=True)
                 # choose datatype
                 while True:
                     main.clear()
@@ -647,10 +651,10 @@ def delete_user(role):
 
     while True:
         print(f"\n--- Delete {role} ---")
-        id_to_delete = input(f"Enter the id of the {role} you want to delete: ").strip()
+        search_people(role)
 
         choice = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-        if choice == "n":
+        if choice.lower() == "n":
             break
         
         cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
@@ -666,7 +670,7 @@ def delete_user(role):
             cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
             connection.commit()
             print(f"{role} deleted successfully")
-            log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
+            log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
             time.sleep(2)
             break
 
@@ -696,7 +700,7 @@ def reset_pw(role):
             
             print("Password reset successfully")
 
-            log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
+            log_instance.log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
             break
 
@@ -768,7 +772,7 @@ def add_member():
 
     main.clear()
     print("Member request processed successfully")
-    log_activity(super_username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
+    log_instance.log_activity(super_username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
     time.sleep(2)
 
     return (first_name, last_name)
@@ -779,9 +783,38 @@ def input_and_validate(prompt, validate_func, default_value=""):
         return data
     else:
         print("Invalid input provided.")
-        log_activity("test", "idk", "invalid", "No")
+        log_instance.log_activity("System", "Invalid input", "Validation did not pass", "No")
 
-def show_members(members):
+def search_people(role):
+    connection = sqlite3.connect("mealmanagement.db")
+    cursor = connection.cursor()
+    while True:
+        if role == "member":
+                search_term = input("Enter search term: ").strip()
+                search_results = search(search_term, "Members")
+                if (len(search_results) == 0):
+                    main.clear()
+                    print("No members found")
+                    time.sleep(2)
+                    return
+                else:
+                    show_members(search_results[1:], from_modify=False)
+        elif role == "admin" or role == "consultant":
+            search_term = input("Enter search term: ").strip()
+            search_results = search(search_term, "Users", role)
+            if (len(search_results) == 0):
+                main.clear()
+                print(f"No {role}s found")
+                time.sleep(2)
+                return
+            else:
+                show_members(search_results[1:], from_modify=False)
+        else:
+            main.clear()
+            print("Invalid input")
+            time.sleep(2)
+
+def show_members(members, from_modify=False):
     
     # Check if any members are found
     if members == []:
@@ -790,7 +823,7 @@ def show_members(members):
         time.sleep(2)
         return
 
-    current_member = 1
+    current_member = 0
     # Show user data
     while True:
         main.clear()
@@ -800,31 +833,37 @@ def show_members(members):
         member.ShowData(members[current_member])
 
         # Show page number and menu
-        print("\n--- page", current_member, "/", len(members), "---")
+        print(f"\n--- page {current_member + 1} / {len(members)} ---")
         print("N. Next member")
         print("P. Previous member")
-        print("Enter the pagenumber of the member you want to update (or N/P for another member): ")
+        print("B. Go back")
+        if from_modify:
+            print("\nEnter the pagenumber of the member you want to update (or N/P for another member): ")
         choice = input("Choose an option: ").strip()
-        if choice == "N" or choice == "n":
-            if current_member == len(members):
+        if choice.lower() == "n" or choice.lower() == "no":
+            if current_member == len(members) - 1:
                 main.clear()
                 print("You have reached the last page")
                 time.sleep(2)
             else:
                 current_member += 1
-        elif choice == "P" or choice == "p":
+        elif choice.lower() == "p":
             if current_member == 0:
                 main.clear()
                 print("You are already at the first page")
                 time.sleep(2)
             else:
                 current_member -= 1
+        elif choice.lower() == "b":
+            member_menu()
         else:
             member_to_update = choice
             try:
-                if int(member_to_update) > len(members):
+                member_to_update = int(choice) - 1
+                if member_to_update < 0 or member_to_update >= len(members):
                     main.clear()
                     print("Invalid input")
+                    log_instance.log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
                     time.sleep(2)
                     continue
                 return members[int(member_to_update)][0]
@@ -833,6 +872,7 @@ def show_members(members):
                 print("Invalid input")
                 time.sleep(2)
                 return
+
 
 def make_backup(backup_path):
     connection = sqlite3.connect("mealmanagement.db")
@@ -917,47 +957,4 @@ def restore_backup(db_path, zip_path):
             os.rmdir('backup')
 
         print("Backup restored")
-        time.sleep(2)
-
-def see_logs(date=None):
-    file_path = 'logs/mealmanagement.log'
-    if date:
-        file_path = f'logs/mealmanagement.log.{date}'
-
-    try:
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-            total_lines = len(lines)
-            pages = (total_lines + 19) // 20
-
-            page = 0
-            while True:
-                main.clear()
-                start_index = page * 20
-                end_index = min((page + 1) * 20, total_lines)
-                current_page_lines = lines[start_index:end_index]
-
-                print(f"\n--- Page {page + 1} / {pages} ---\n")
-                for line in current_page_lines:
-                    print(line.strip())
-
-                print("\n1. Next page")
-                print("2. Previous page")
-                print("3. Go back")
-                choice = input("Choose an option (1/2/3): ").strip()
-
-                if choice == "1":
-                    if page < pages - 1:
-                        page += 1
-                elif choice == "2":
-                    if page > 0:
-                        page -= 1
-                elif choice == "3":
-                    break
-                else:
-                    print("Invalid input")
-                    time.sleep(2)
-                
-    except FileNotFoundError:
-        print(f"The file {file_path} does not exist.")
         time.sleep(2)
