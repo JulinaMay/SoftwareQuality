@@ -23,7 +23,7 @@ def menu(username):
 
     while True:
         print("\n--- System Admin Menu ---")
-        print(f"--Welcome {username}--\n")
+        print(f"--Welcome {username}--")
         log_instance.show_notifications()
     #Eigen gegevens
         print("1. Update password")

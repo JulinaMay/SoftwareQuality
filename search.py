@@ -41,7 +41,7 @@ def search(search_term, table, column="*", role=None):
         columns_to_query = column
     
     if role:
-        query = f"SELECT {columns_to_query} FROM {table} WHERE role = ?"
+        query = f"SELECT {columns_to_query} FROM {table} WHERE role_level = ?"
         cursor.execute(query, (role,))
     else:
         query = f"SELECT {columns_to_query} FROM {table}"
@@ -72,20 +72,25 @@ def search(search_term, table, column="*", role=None):
     return search_results
 
 
-def display_search_results(search_results):
+def display_search_results(search_results, show_numbers=True):
     print("--- Results ---")
     if type(search_results) == str:
         print(search_results)
         return
 
-    for i in range(len(search_results)):
+    header = "     " if show_numbers else ""
+    header += "ID".ljust(15) + "Name".ljust(15) + "First Name".ljust(15) + "Last Name".ljust(15)
+    print(header)
+    print("-" * len(header))
+
+    for i, result in enumerate(search_results[1:], start=1):
         line = ""
-        if i == 0:
-            line += "     "
-        else:
+            
+        if show_numbers:
             line += f"[{i}]  "
+
         for j in range(4):
-            line += str(search_results[i][j]).ljust(15)
+            line += str(result[j]).ljust(15)
         print(line)
     return
     
