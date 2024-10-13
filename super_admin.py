@@ -346,12 +346,14 @@ def modify_user(role):
         print("\n--- Update user ---")
     
         # Search for user
-        if role == "admin" or role == "consultant":
+        if role in ["admin", "consultant"]:
             main.clear()
-            search_term = input("Enter search term: ").strip()
-            search_results = search(search_term, "Users")
-            display_search_results(search_results)
+            search_term = input("Enter search term (or 0 to go back): ").strip()
+            search_results = search(search_term, "Users", role=role)
+            display_search_results(search_results, show_numbers=True)
             # menu
+            if search_term == "0":
+                break
             try:
                 choice = int(input("\nEnter the number of the result you want to choose (or 0 to cancel): "))
                 if choice == 0:
@@ -425,8 +427,11 @@ def modify_user(role):
         
         # Search for member
         elif role == "member":
-            search_term = input("Enter search term: ").strip()
+            search_term = input("Enter search term (or 0 to go back): ").strip()
             search_results = search(search_term, "Members")
+
+            if search_term == "0":
+                break
             if (len(search_results) == 0):
                 main.clear()
                 print("No members found")
@@ -664,28 +669,38 @@ def delete_user(role):
         print(f"\n--- Delete {role} ---")
         search_results = search_people(role)
 
+        if not search_results:
+            print(f"No {role}s found")
+            time.sleep(2)
+            break
+
         if role == "member":
-            # if user id == empty then break
-            if search_results == None:
+            # Check if the search result is empty
+            if search_results is None or len(search_results) == 0:
+                print(f"No {role}s found")
                 break
+
             # Confirm deletion
-            choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
+            choice_two = input(f"Are you sure you want to remove this {role}? (y/n) ").strip().lower()
             if choice_two in ["n", "no"]:
                 break
-            
-            elif choice in ["y", "yes"]:
-                cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
+            elif choice_two in ["y", "yes"]:
+                # Assuming the first value of search_results is the member id
+                member_id = search_results[0][0]  
+                cursor.execute("DELETE FROM Members WHERE member_id = ?", (member_id,))
                 connection.commit()
-                print(f"{role} deleted successfully")
-                log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {search_results}", "No")
+                print(f"{role.capitalize()} deleted successfully")
+                log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {member_id}", "No")
                 time.sleep(2)
                 break
             else:
                 print("Invalid input. Action cancelled.")
                 log_instance.log_activity(super_username, "Delete member", "Invalid input for delete member", "No")
                 time.sleep(2)
+
         else:
-            # Choose user to delete
+            # Choose admin/consultant to delete
+            display_search_results(search_results, show_numbers=True)
             choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
             if choice == "0":
                 break
@@ -695,35 +710,39 @@ def delete_user(role):
                     print("Invalid choice. Please select a valid number.")
                     time.sleep(2)
                     continue
+
             except ValueError:
-                print("Please enter a number.")
+                print("Please enter a valid number.")
                 time.sleep(2)
                 continue
 
-            # Confirm deletion
+            # Confirm deletion for admin/consultant
             choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-            if choice_two.lower() == "n":
+            if choice_two in ["n", "no"]:
                 break
-            
-            # Delete user
+            elif choice_two in ["y", "yes"]:
+                # Delete admin/consultant
+                id_to_delete = search_results[choice][0]
+                cursor.execute("SELECT * FROM Users WHERE id = ? AND role_level = ?", (id_to_delete, role))
+                user = cursor.fetchall()
 
-            id_to_delete = search_results[choice][0]
-            cursor.execute("SELECT * FROM Users WHERE id = ?", (id_to_delete,))
-            user = cursor.fetchall()
-            decrypted_name = decrypt_data(private_key(), user[0][1])
-
-            if user == []:
-                main.clear()
-                print("User not found")
+                if not user:
+                    print("User not found")
+                    time.sleep(2)
+                    break
+                else:
+                    decrypted_name = decrypt_data(private_key(), user[0][1])
+                    cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
+                    connection.commit()
+                    print(f"{role.capitalize()} deleted successfully")
+                    log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
                 time.sleep(2)
                 break
             else:
-                cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
-                connection.commit()
-                print(f"{role} deleted successfully")
-                log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
+                print("Invalid input. Action cancelled.")
+                log_instance.log_activity(super_username, "Delete user", "Invalid input for delete action", "No")
                 time.sleep(2)
-                break
+     
 
 def reset_pw(role):
     main.clear()
@@ -732,10 +751,40 @@ def reset_pw(role):
     
     while True:
         print(f"\n--- Reset password of {role} ---")
-        
-        pw_to_delete = input(f"Enter the id of the {role} for the password you want to delete: ").strip()
+        search_results = search_people(role)
 
-        cursor.execute("SELECT username, password FROM Users WHERE id = ?", (pw_to_delete,))
+        if not search_results:
+            print(f"No {role}s found")
+            time.sleep(2)
+            break
+
+        if role in ["admin", "consultant"]:
+            display_search_results(search_results, show_numbers=False)
+
+        pw_to_reset = input(f"\nEnter the id of the {role} for the password you want to reset (or 0 to go back): ").strip()
+        
+        if pw_to_reset == "0":
+            break
+        try:
+            pw_to_reset = int(pw_to_reset)
+            selected_user = None
+            for result in search_results:
+                if result[0] == pw_to_reset:
+                    selected_user = result
+                    break
+            if not selected_user:
+                print("Invalid choice. Please select a valid number.")
+                time.sleep(2)
+                continue
+
+        except ValueError:
+            print("Please enter a number.")
+            time.sleep(2)
+            continue
+        
+        selected_user_id = pw_to_reset
+        
+        cursor.execute("SELECT username, password FROM Users WHERE id = ? AND role_level = ?", (selected_user_id, role))
         user_to_change = cursor.fetchall()
 
         if not user_to_change:
@@ -746,7 +795,7 @@ def reset_pw(role):
         else:
             decrypted_name = decrypt_data(private_key(), user_to_change[0][0])
     
-            cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), pw_to_delete))
+            cursor.execute("UPDATE Users SET password = ? WHERE id = ?", (bcrypt.hashpw("Temp_123?".encode('utf-8'), bcrypt.gensalt()), selected_user_id))
             connection.commit()
             
             print("Password reset successfully")
@@ -850,13 +899,12 @@ def search_people(role):
                 id_to_update = show_members(search_results[1:], from_modify=False)
                 return id_to_update
     elif role in ["admin", "consultant"]:
-        search_results = search(search_term, "Users", role)
+        search_results = search(search_term, "Users", role=role)
         if not search_results:
             print(f"No {role}s found")
             time.sleep(2)
             return None
         else:
-            display_search_results(search_results)
             return search_results
     else:
         main.clear()
