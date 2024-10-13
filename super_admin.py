@@ -793,7 +793,7 @@ def delete_user(role, username):
                 time.sleep(2)
      
 
-def reset_pw(role):
+def reset_pw(role, username):
     main.clear()
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
