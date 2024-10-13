@@ -172,7 +172,8 @@ def validate_email(email):
 
 
 def validate_phone_number(phone_number):
-    pattern = r"^\+(?:[0-9] ?){6,14}[0-9]$" # telefoonnummer regex
+    # pattern = r"^\+(?:[0-9] ?){6,14}[0-9]$" # telefoonnummer regex
+    pattern = r"^[0-9]{8}$" # 0 t/m 9, 8 cijfers
     syntax = False
 
     if re.match(pattern, phone_number):

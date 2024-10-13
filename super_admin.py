@@ -762,10 +762,10 @@ def add_member():
     city = input_and_validate("Enter city: ", validate_city)
     country = input_and_validate("Enter country: ", validate_country)
     email = input_and_validate("Enter email: ", validate_email)
-    phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
+    phone_number = "+31-6-" + input_and_validate("Enter phone number: ", validate_phone_number)
     
     #  Create unique member_id
-    current_date = str(datetime.now().year)
+    current_date = str(datetime.datetime.now().year)
     print(type(current_date))
     print(current_date[-2:])
     member_id = current_date[-2:]
