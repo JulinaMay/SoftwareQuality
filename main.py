@@ -108,7 +108,6 @@ def Login():
                 elif role_level == "admin":
                     log_instance.log_activity(decrypted_username, "Login successful", f"{first_name} {last_name} (admin) logged in", "No")
                     admin.menu(decrypted_username)
-                    log_instance.see_logs()
                 break  # Exit the loop after a successful login
             else:
                 attempts += 1

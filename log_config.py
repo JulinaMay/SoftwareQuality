@@ -49,7 +49,7 @@ class logmanager:
         if logmanager.unread_suspicious_count > 0:
             print(f"\n*** You have {logmanager.unread_suspicious_count} unread suspicious activity logs. ***\n")
         else:
-            print("\nNo unread suspicious acitivities.")
+            print("\nNo unread suspicious acitivities.\n")
 
         
     def see_logs(self, date=None):
@@ -71,22 +71,22 @@ class logmanager:
                     end_index = min((page + 1) * 20, total_lines)
                     current_page_lines = lines[start_index:end_index]
 
-                    print(f"\n--- Page {page + 1} / {pages} ---\n")
                     for line in current_page_lines:
                         print(line.strip())
 
-                    print("\n1. Next page")
-                    print("2. Previous page")
-                    print("3. Go back")
-                    choice = input("Choose an option (1/2/3): ").strip()
+                    print(f"\n--- Page {page + 1} / {pages} ---\n")
+                    print("N. Next page")
+                    print("P. Previous page")
+                    print("B. Go back")
+                    choice = input("Choose an option (1/2/3): ").strip().lower()
 
-                    if choice == "1":
+                    if choice == "n":
                         if page < pages - 1:
                             page += 1
-                    elif choice == "2":
+                    elif choice == "p":
                         if page > 0:
                             page -= 1
-                    elif choice == "3":
+                    elif choice == "b":
                         logmanager.unread_suspicious_count = 0
                         break
                     else:

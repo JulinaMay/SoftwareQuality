@@ -23,7 +23,7 @@ def menu(username):
 
     while True:
         print("\n--- System Admin Menu ---")
-        print(f"--Welcome {username}--\n")
+        print(f"--Welcome {username}--")
         log_instance.show_notifications()
     #Eigen gegevens
         print("1. Update password")
@@ -53,7 +53,7 @@ def menu(username):
             update_password(username)
         elif choice == "2":
             main.clear()
-            list_users()
+            list_users("consultant")
         elif choice == "3":
             main.clear()
             consultant_menu()

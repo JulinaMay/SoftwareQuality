@@ -97,12 +97,16 @@ def menu():
             connection.close()
 
 # List of users
-def list_users():
+def list_users(role_filter=None):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
+    if role_filter:
+        cursor.execute("SELECT id, username, role_level FROM users WHERE role_level =?" ,(role_filter,))
+    else:
+        cursor.execute("SELECT id, username, role_level FROM Users")
+    
     # Get user data
-    cursor.execute("SELECT id, username, role_level FROM Users")
     user_data = cursor.fetchall()
 
     # Decrypt data
@@ -129,25 +133,25 @@ def list_users():
             print(f"{id:<5}{username:<25}{role:<10}")
 
         print(f"\n--- page {page + 1} / {total_pages} ---")
-        print("1. Next page")
-        print("2. Previous page")
-        print("3. Go back")
-        choice = input("Choose an option (1/2/3): ").strip()
-        if choice == "1":
+        print("N. Next page")
+        print("P. Previous page")
+        print("B. Go back")
+        choice = input("Choose an option (1/2/3): ").strip().lower()
+        if choice == "n":
             if page == total_pages - 1:
                 print("You have reached the last page")
                 time.sleep(2)
                 continue
             else:
                 page += 1
-        elif choice == "2":
+        elif choice == "p":
             if page == 0:
                 print("You are already at the first page")
                 time.sleep(2)
                 continue
             else:
                 page -= 1
-        elif choice == "3":
+        elif choice == "b":
             main.clear()
             break
         else:
@@ -261,13 +265,16 @@ def system_menu():
             main.clear()
             print("Are you sure you want to restore the backup? This will delete all current data.")
             choice = input("Choose an option (yes/no): ").strip().lower()
-            if choice == "y" or choice == "yes":
+            if choice in ["y", "yes"]:
                 restore_backup(db_path, zip_path)
                 log_instance.log_activity(super_username, "System", "Backup restored", "No")
-            else:
+            elif choice in ["n", "no"]:
                 print("Action cancelled")
                 log_instance.log_activity(super_username, "System", "Backup restore cancelled", "No")
                 time.sleep(2)
+            else:
+                print("Invalid input. Action cancelled.")
+                log_instance.log_activity(super_username, "System", "Invalid input for backup restore", "No")
         elif choice == "3":
             date = input("Keep empty for today's logs or enter the date of the log file you want to see (yyyy-mm-dd): ").strip()
             main.clear()
@@ -356,11 +363,9 @@ def modify_user(role):
                     print(f"Selected user: {selected_result[1]}")
                 else:
                     print("Invalid choice. Please select a valid number.")
-                    input("Press enter to continue")
                     continue
             except ValueError:
                 print("Please enter a number.")
-                input("Press enter to continue.")
                 continue
             
             while True:
@@ -429,6 +434,8 @@ def modify_user(role):
                 return
             else:
                 member_to_update = show_members(search_results[1:], from_modify=True)
+                if member_to_update is None:
+                    break
                 # choose datatype
                 while True:
                     main.clear()
@@ -444,8 +451,10 @@ def modify_user(role):
                     print("10. Country")
                     print("11. Email")
                     print("12. Phone number")
-                    choice = input("Choose the datatype you want to change (1/2/3/4/5/6/7/8/9/10/11/12): ")
-                    if choice == "1":
+                    choice = input("Choose the datatype you want to change (1/2/3/4/5/6/7/8/9/10/11/12 or 'b' to go back): ").strip().lower()
+                    if choice == "b":
+                        break
+                    elif choice == "1":
                         new_data = input("Enter new first name: ").strip()
                         if validate_first_name(new_data):
                             if modify_data("first_name", "Members", member_to_update, new_data):
@@ -661,17 +670,20 @@ def delete_user(role):
                 break
             # Confirm deletion
             choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-            if choice_two.lower() == "n":
+            if choice_two in ["n", "no"]:
                 break
-
-            cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
-            connection.commit()
-            print(f"{role} deleted successfully")
-            log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {search_results}", "No")
-            time.sleep(2)
-            break
-
-
+            
+            elif choice in ["y", "yes"]:
+                cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
+                connection.commit()
+                print(f"{role} deleted successfully")
+                log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {search_results}", "No")
+                time.sleep(2)
+                break
+            else:
+                print("Invalid input. Action cancelled.")
+                log_instance.log_activity(super_username, "Delete member", "Invalid input for delete member", "No")
+                time.sleep(2)
         else:
             # Choose user to delete
             choice = input("Enter the number of the user you want to delete (or 0 to cancel): ").strip()
@@ -766,10 +778,8 @@ def add_member():
     
     #  Create unique member_id
     current_date = str(datetime.now().year)
-    print(type(current_date))
-    print(current_date[-2:])
     member_id = current_date[-2:]
-    print(member_id)
+
 
     checksum = sum(int(digit) for digit in member_id)
     for i in range(7):
@@ -779,7 +789,7 @@ def add_member():
 
     checksum %= 10
     member_id += str(checksum)
-    print(f"stopt het hier? {member_id}")
+
     # encryption
     enc_first_name = encrypt_data(public_key(), first_name)
     enc_last_name = encrypt_data(public_key(), last_name)
@@ -793,7 +803,6 @@ def add_member():
     enc_country = encrypt_data(public_key(), country)
     enc_email = encrypt_data(public_key(), email)
     enc_phone_number = encrypt_data(public_key(), phone_number)
-    print(f"member_id: {member_id}, type: {type(member_id)}")
 
     # Insert member into Members table
     cursor.execute(
@@ -817,17 +826,18 @@ def add_member():
     return (first_name, last_name)
     
 def input_and_validate(prompt, validate_func, default_value=""):
-    data = default_value or input(prompt).strip()
-    if validate_func(data):
-        return data
-    else:
-        print("Invalid input provided.")
-        log_instance.log_activity("System", "Invalid input", "Validation did not pass", "No")
+    while True:
+        data = default_value or input(prompt).strip()
+        if validate_func(data):
+            return data
+        else:
+            print("Invalid input provided.")
+            log_instance.log_activity("System", "Invalid input", "Validation did not pass", "No")
 
 def search_people(role):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
-
+    main.clear()
     search_term = input("Enter search term: ").strip()
     
     if role == "member":
@@ -838,7 +848,6 @@ def search_people(role):
                 return None
             else:
                 id_to_update = show_members(search_results[1:], from_modify=False)
-                input("Press enter to continue..")
                 return id_to_update
     elif role in ["admin", "consultant"]:
         search_results = search(search_term, "Users", role)
@@ -848,7 +857,6 @@ def search_people(role):
             return None
         else:
             display_search_results(search_results)
-            input("Press enter to continue..")
             return search_results
     else:
         main.clear()
@@ -883,26 +891,25 @@ def show_members(members, from_modify=False):
         if from_modify:
             print("\nEnter the pagenumber of the member you want to update (or N/P for another member): ")
         
-        choice = input("Choose an option: ").strip()
+        choice = input("Choose an option: ").strip().lower()
         
-        if choice.lower() == "n" or choice.lower() == "no":
+        if choice == "n":
             if current_member == len(members) - 1:
                 main.clear()
                 print("You have reached the last page")
                 time.sleep(2)
             else:
                 current_member += 1
-        elif choice.lower() == "p":
+        elif choice == "p":
             if current_member == 0:
                 main.clear()
                 print("You are already at the first page")
                 time.sleep(2)
             else:
                 current_member -= 1
-        elif choice.lower() == "b":
-            return None
+        elif choice == "b":
+            return
         else:
-            # member_to_update = choice
             try:
                 member_to_update = int(choice) - 1
                 if member_to_update < 0 or member_to_update >= len(members):
