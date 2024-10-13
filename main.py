@@ -24,15 +24,15 @@ import time
 
 
 def main():
-    try:
-        log_instance.log_activity("System", "Program started", "No", "No") 
-        database.create_or_connect_db()
-        main_menu()
-    except Exception as ex:
-        clear()
-        print("An error occurred. Please try again.")
-        log_instance.log_activity("System", f"Program crash created at: {ex}", "No", "No")
-        return
+    # try:
+    log_instance.log_activity("System", "Program started", "No", "No") 
+    database.create_or_connect_db()
+    main_menu()
+    # except Exception as ex:
+    #     clear()
+    #     print("An error occurred. Please try again.")
+    #     log_instance.log_activity("System", f"Program crash created at: {ex}", "No", "No")
+    #     return
     
     
 def main_menu():

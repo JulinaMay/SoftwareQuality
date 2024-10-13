@@ -722,21 +722,11 @@ def delete_user(role, username):
             choice_two = input(f"Are you sure you want to remove this {role}? (y/n) ").strip().lower()
             if choice_two in ["n", "no"]:
                 break
-
+            elif choice_two in ["y", "yes"]:
                 cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
                 connection.commit()
-                print(f"{role} deleted successfully")
-                log_instance.log_activity(username, "Delete member", f"Deleted member with id: {search_results}", "No")
-                time.sleep(2)
-                break
-
-            elif choice_two in ["y", "yes"]:
-                # Assuming the first value of search_results is the member id
-                member_id = search_results[0][0]  
-                cursor.execute("DELETE FROM Members WHERE member_id = ?", (member_id,))
-                connection.commit()
                 print(f"{role.capitalize()} deleted successfully")
-                log_instance.log_activity(username, "Delete member", f"Deleted member with id: {member_id}", "No")
+                log_instance.log_activity(username, "Delete member", f"Deleted member with id: {search_results}", "No")
                 time.sleep(2)
                 break
             else:
@@ -754,43 +744,13 @@ def delete_user(role, username):
                 choice = int(choice)
                 if choice < 1 or choice > len(search_results):
                     print("Invalid choice. Please select a valid number.")
-                    log_instance.log_activity(username, "Delete user", "Invalid input in the delete user menu", "No")
                     time.sleep(2)
                     continue
 
             except ValueError:
-                print("Please enter a number.")
-                log_instance.log_activity(username, "Delete user", "Invalid input in the delete user menu", "No")
+                print("Please enter a valid number.")
                 time.sleep(2)
                 continue
-
-            # Confirm deletion for admin/consultant
-            choice_two = input(f"Are you sure you want to remove {role}? (y/n) ").strip().lower()
-            if choice_two in ["n", "no"]:
-                break
-            elif choice_two in ["y", "yes"]:
-                # Delete admin/consultant
-                id_to_delete = search_results[choice][0]
-                cursor.execute("SELECT * FROM Users WHERE id = ? AND role_level = ?", (id_to_delete, role))
-                user = cursor.fetchall()
-
-                if not user:
-                    print("User not found")
-                    log_instance.log_activity(username, "Delete user", "Nonexistent user tried to delete", "No")
-                    time.sleep(2)
-                    break
-                else:
-                    decrypted_name = decrypt_data(private_key(), user[0][1])
-                    cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
-                    connection.commit()
-                    print(f"{role.capitalize()} deleted successfully")
-                    log_instance.log_activity(username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
-                time.sleep(2)
-                break
-            else:
-                print("Invalid input. Action cancelled.")
-                log_instance.log_activity(super_username, "Delete user", "Invalid input for delete action", "No")
-                time.sleep(2)
      
 
 def reset_pw(role, username):
@@ -800,7 +760,7 @@ def reset_pw(role, username):
     
     while True:
         print(f"\n--- Reset password of {role} ---")
-        search_results = search_people(role)
+        search_results = search_people(role, username)
 
         if not search_results:
             print(f"No {role}s found")
