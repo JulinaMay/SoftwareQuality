@@ -53,15 +53,15 @@ def menu(username):
             update_password(username)
         elif choice == "2":
             main.clear()
-            list_users("consultant")
+            list_users(username)
         elif choice == "3":
             main.clear()
-            consultant_menu()
+            consultant_menu(username)
         elif choice == "4":
-            system_menu()
+            system_menu(username)
         elif choice == "5":
             main.clear()    
-            member_menu()
+            member_menu(username)
         elif choice == "6":
             print("You logged out, Goodbye!")
             log_instance.log_activity(username, "System", "Program exited", "No")

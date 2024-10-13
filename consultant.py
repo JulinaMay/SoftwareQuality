@@ -6,7 +6,7 @@ import bcrypt
 import main
 import time
 
-from validation import *
+from safe_data import *
 from super_admin import *
 
 # logging
@@ -48,13 +48,13 @@ def menu(username):
 
             if choice == "1":
                 main.clear()
-                add_member()
+                add_member(username)
             elif choice == "2":
                 main.clear()
-                modify_user("member")
+                modify_user("member", username)
             elif choice == "3":
                 main.clear()
-                delete_user("member")
+                delete_user("member", username)
             elif choice == "4":
                 continue
             else:
@@ -63,7 +63,7 @@ def menu(username):
                 time.sleep(2)
         elif choice == "3":
             print("You logged out, Goodbye!")
-            log_instance.log_activity(super_username, "System", "Program exited", "No")
+            log_instance.log_activity(f"{username}", "System", "Logged out", "No")
             break
         else:
             log_instance.log_activity(f"{username}", "System", "Invalid input in the main menu", "No")

@@ -73,19 +73,19 @@ def menu():
 
         if choice == "1":
             main.clear()
-            list_users()
+            list_users(super_username)
         elif choice == "2":
             main.clear()
-            consultant_menu()
+            consultant_menu(super_username)
         elif choice == "3":
             main.clear()
-            systemadmin_menu()
+            systemadmin_menu(super_username)
         elif choice == "4":
             main.clear()
-            system_menu()
+            system_menu(super_username)
         elif choice == "5":
             main.clear()
-            member_menu()
+            member_menu(super_username)
         elif choice == "6":
             print("You logged out, Goodbye!")
             log_instance.log_activity(super_username, "System", "Program exited", "No")
@@ -97,7 +97,7 @@ def menu():
             connection.close()
 
 # List of users
-def list_users(role_filter=None):
+def list_users(_username, role_filter=None):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
@@ -156,13 +156,13 @@ def list_users(role_filter=None):
             break
         else:
             print("Invalid input")
-            log_instance.log_activity(super_username, "List of users", "Invalid input in the list of users", "No")
+            log_instance.log_activity(_username, "List of users", "Invalid input in the list of users", "No")
             continue
     
     connection.close()
 
 # Consultant menu
-def consultant_menu():
+def consultant_menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -180,22 +180,22 @@ def consultant_menu():
             print("Make a new consultant")
             user.create_account("consultant")
             print("\nAdded a new consultant")
-            log_instance.log_activity(super_username, "Add a consultant", "Added a new consultant", "No")
+            log_instance.log_activity(username, "Add a consultant", "Added a new consultant", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
-            modify_user("consultant")
+            modify_user("consultant", username)
         elif choice == "3":
             main.clear()
-            delete_user("consultant")
+            delete_user("consultant", username)
         elif choice == "4":
             main.clear()
-            reset_pw("consultant")
+            reset_pw("consultant", username)
         elif choice == "5":
             break
 
 # System admin menu
-def systemadmin_menu():
+def systemadmin_menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -213,26 +213,26 @@ def systemadmin_menu():
             print("Make a new system admin")
             user.create_account("admin")
             print("\nAdded a new admin")
-            log_instance.log_activity(super_username, "System admin created", "New system administrator created successfully", "No")
+            log_instance.log_activity(username, "System admin created", "New system administrator created successfully", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
-            modify_user("admin")
+            modify_user("admin", username)
         elif choice == "3":
             main.clear()
-            delete_user("admin")
+            delete_user("admin", username)
         elif choice == "4":
             main.clear()
-            reset_pw("admin")
+            reset_pw("admin", username)
         elif choice == "5":
             break # this opens the logs??
         else:
             print("Invalid input")
-            log_instance.log_activity(super_username, "System", "Invalid input in the admin menu", "No")
+            log_instance.log_activity(username, "System", "Invalid input in the admin menu", "No")
             connection.close()
 
 # System menu
-def system_menu():
+def system_menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -259,7 +259,7 @@ def system_menu():
             # create_zip(backup_path, zip_path)
             create_zip(backup_path, log_dir, zip_path)
             print("Backup created")
-            log_instance.log_activity(super_username, "System", "Backup created", "No")
+            log_instance.log_activity(username, "System", "Backup created", "No")
             time.sleep(2)
         elif choice == "2":
             main.clear()
@@ -267,10 +267,10 @@ def system_menu():
             choice = input("Choose an option (yes/no): ").strip().lower()
             if choice in ["y", "yes"]:
                 restore_backup(db_path, zip_path)
-                log_instance.log_activity(super_username, "System", "Backup restored", "No")
+                log_instance.log_activity(username, "System", "Backup restored", "No")
             elif choice in ["n", "no"]:
                 print("Action cancelled")
-                log_instance.log_activity(super_username, "System", "Backup restore cancelled", "No")
+                log_instance.log_activity(username, "System", "Backup restore cancelled", "No")
                 time.sleep(2)
             else:
                 print("Invalid input. Action cancelled.")
@@ -283,12 +283,12 @@ def system_menu():
             break
         else:
             print("Invalid input")
-            log_instance.log_activity(super_username, "System", "Invalid input in the system menu", "No")
+            log_instance.log_activity(username, "System", "Invalid input in the system menu", "No")
             time.sleep(2)
         connection.close()
 
 # Member menu
-def member_menu():
+def member_menu(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     while True:
@@ -304,20 +304,20 @@ def member_menu():
 
         if choice == "1":
             main.clear()
-            add_member()
+            add_member(username)
         elif choice == "2":
             main.clear()
-            modify_user("member")
+            modify_user("member", username)
         elif choice == "3":
             main.clear()
-            delete_user("member")
+            delete_user("member", username)
         elif choice == "4":
-            search_people("member")
+            search_people("member", username)
         elif choice == "5":
             break
         else:
             print("Invalid input")
-            log_instance.log_activity(super_username, "Member menu", "Invalid input in the member menu", "No")
+            log_instance.log_activity(username, "Member menu", "Invalid input in the member menu", "No")
             connection.close()
 
 def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> bool:
@@ -340,7 +340,7 @@ def modify_data(datatype_to_update, table_to_update, id_to_update, new_data) -> 
 
     return True
 
-def modify_user(role):
+def modify_user(role, username): # TODO: add logging
     while True:
         main.clear()
         print("\n--- Update user ---")
@@ -438,7 +438,7 @@ def modify_user(role):
                 time.sleep(2)
                 return
             else:
-                member_to_update = show_members(search_results[1:], from_modify=True)
+                member_to_update = show_members(search_results[1:], username, from_modify=True)
                 if member_to_update is None:
                     break
                 # choose datatype
@@ -465,14 +465,17 @@ def modify_user(role):
                             if modify_data("first_name", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("First name updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated first name of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("First name not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update first name of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "2":
@@ -481,14 +484,17 @@ def modify_user(role):
                             if modify_data("last_name", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Last name updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated last name of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Last name not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update last name of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "3":
@@ -497,14 +503,17 @@ def modify_user(role):
                             if modify_data("age", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Age updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated age of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Age not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update age of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "4":
@@ -513,14 +522,17 @@ def modify_user(role):
                             if modify_data("gender", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Gender updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated gender of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Gender not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update gender of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "5":
@@ -529,14 +541,17 @@ def modify_user(role):
                             if modify_data("weight", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Weight updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated weight of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Weight not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update weight of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "6":
@@ -545,14 +560,17 @@ def modify_user(role):
                             if modify_data("street", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Street updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated street of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Street not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update street of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "7":
@@ -561,14 +579,17 @@ def modify_user(role):
                             if modify_data("house_number", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("House number updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated house number of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("House number not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update house number of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "8":
@@ -577,14 +598,17 @@ def modify_user(role):
                             if modify_data("postal_code", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Postal code updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated postal code of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Postal code not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update postal code of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "9":
@@ -593,14 +617,17 @@ def modify_user(role):
                             if modify_data("city", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("City updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated city of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("City not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update city of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "10":
@@ -609,14 +636,17 @@ def modify_user(role):
                             if modify_data("country", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Country updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated country of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Country not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update country of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "11":
@@ -625,14 +655,17 @@ def modify_user(role):
                             if modify_data("email", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Email updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated email of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Email not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update email of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     elif choice == "12":
@@ -641,33 +674,38 @@ def modify_user(role):
                             if modify_data("phone_number", "Members", member_to_update, new_data):
                                 main.clear()
                                 print("Phone number updated successfully")
+                                log_instance.log_activity(username, "Modify member", f"Updated phone number of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                             else:
                                 print("Phone number not updated")
+                                log_instance.log_activity(username, "Modify member", f"Failed to update phone number of member with id: {member_to_update}", "No")
                                 time.sleep(2)
                                 break
                         else:
                             print("Invalid input")
+                            log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                             time.sleep(2)
                             break
                     else:
                         print("Invalid input")
+                        log_instance.log_activity(username, "Modify member", "Invalid input in the modify member menu", "No")
                         time.sleep(2)
             return
             
         else:
             main.clear()
             print("Invalid input")
+            log_instance.log_activity(username, "Modify user", "Invalid input in the modify user menu", "No")
             time.sleep(2)
 
-def delete_user(role):
+def delete_user(role, username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
     while True:
         print(f"\n--- Delete {role} ---")
-        search_results = search_people(role)
+        search_results = search_people(role, username)
 
         if not search_results:
             print(f"No {role}s found")
@@ -684,18 +722,26 @@ def delete_user(role):
             choice_two = input(f"Are you sure you want to remove this {role}? (y/n) ").strip().lower()
             if choice_two in ["n", "no"]:
                 break
+
+                cursor.execute("DELETE FROM Members WHERE member_id = ?", (search_results,))
+                connection.commit()
+                print(f"{role} deleted successfully")
+                log_instance.log_activity(username, "Delete member", f"Deleted member with id: {search_results}", "No")
+                time.sleep(2)
+                break
+
             elif choice_two in ["y", "yes"]:
                 # Assuming the first value of search_results is the member id
                 member_id = search_results[0][0]  
                 cursor.execute("DELETE FROM Members WHERE member_id = ?", (member_id,))
                 connection.commit()
                 print(f"{role.capitalize()} deleted successfully")
-                log_instance.log_activity(super_username, "Delete member", f"Deleted member with id: {member_id}", "No")
+                log_instance.log_activity(username, "Delete member", f"Deleted member with id: {member_id}", "No")
                 time.sleep(2)
                 break
             else:
                 print("Invalid input. Action cancelled.")
-                log_instance.log_activity(super_username, "Delete member", "Invalid input for delete member", "No")
+                log_instance.log_activity(username, "Delete member", "Invalid input for delete member", "No")
                 time.sleep(2)
 
         else:
@@ -708,11 +754,13 @@ def delete_user(role):
                 choice = int(choice)
                 if choice < 1 or choice > len(search_results):
                     print("Invalid choice. Please select a valid number.")
+                    log_instance.log_activity(username, "Delete user", "Invalid input in the delete user menu", "No")
                     time.sleep(2)
                     continue
 
             except ValueError:
-                print("Please enter a valid number.")
+                print("Please enter a number.")
+                log_instance.log_activity(username, "Delete user", "Invalid input in the delete user menu", "No")
                 time.sleep(2)
                 continue
 
@@ -728,6 +776,7 @@ def delete_user(role):
 
                 if not user:
                     print("User not found")
+                    log_instance.log_activity(username, "Delete user", "Nonexistent user tried to delete", "No")
                     time.sleep(2)
                     break
                 else:
@@ -735,7 +784,7 @@ def delete_user(role):
                     cursor.execute("DELETE FROM Users WHERE id = ?", (id_to_delete,))
                     connection.commit()
                     print(f"{role.capitalize()} deleted successfully")
-                    log_instance.log_activity(super_username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
+                    log_instance.log_activity(username, "Delete user", f"Deleted {role} with name: {decrypted_name}", "No")
                 time.sleep(2)
                 break
             else:
@@ -790,6 +839,7 @@ def reset_pw(role):
         if not user_to_change:
             main.clear()
             print("User not found")
+            log_instance.log_activity(username, "Reset password", "Nonexistent user tried to reset password", "No")
             time.sleep(2)
             continue
         else:
@@ -800,11 +850,11 @@ def reset_pw(role):
             
             print("Password reset successfully")
 
-            log_instance.log_activity(super_username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
+            log_instance.log_activity(username, "Reset password", f"Reset password of {role} with username: {decrypted_name}", "No")
             time.sleep(2)
             break
 
-def add_member():
+def add_member(username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
 
@@ -823,10 +873,10 @@ def add_member():
     city = input_and_validate("Enter city: ", validate_city)
     country = input_and_validate("Enter country: ", validate_country)
     email = input_and_validate("Enter email: ", validate_email)
-    phone_number = input_and_validate("Enter phone number: ", validate_phone_number)
+    phone_number = "+31-6-" + input_and_validate("Enter phone number: ", validate_phone_number)
     
     #  Create unique member_id
-    current_date = str(datetime.now().year)
+    current_date = str(datetime.datetime.now().year)
     member_id = current_date[-2:]
 
 
@@ -838,7 +888,6 @@ def add_member():
 
     checksum %= 10
     member_id += str(checksum)
-
     # encryption
     enc_first_name = encrypt_data(public_key(), first_name)
     enc_last_name = encrypt_data(public_key(), last_name)
@@ -869,7 +918,7 @@ def add_member():
 
     main.clear()
     print("Member request processed successfully")
-    log_instance.log_activity(super_username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
+    log_instance.log_activity(username, "Add member", f"Added member: '{first_name} {last_name}'", "No")
     time.sleep(2)
 
     return (first_name, last_name)
@@ -883,7 +932,7 @@ def input_and_validate(prompt, validate_func, default_value=""):
             print("Invalid input provided.")
             log_instance.log_activity("System", "Invalid input", "Validation did not pass", "No")
 
-def search_people(role):
+def search_people(role, username):
     connection = sqlite3.connect("mealmanagement.db")
     cursor = connection.cursor()
     main.clear()
@@ -896,7 +945,7 @@ def search_people(role):
                 time.sleep(2)
                 return None
             else:
-                id_to_update = show_members(search_results[1:], from_modify=False)
+                id_to_update = show_members(search_results[1:], username, from_modify=False)
                 return id_to_update
     elif role in ["admin", "consultant"]:
         search_results = search(search_term, "Users", role=role)
@@ -912,7 +961,7 @@ def search_people(role):
         time.sleep(2)
         return None
 
-def show_members(members, from_modify=False):
+def show_members(members, username, from_modify=False):
     
     # Check if any members are found
     if not members:
@@ -963,7 +1012,7 @@ def show_members(members, from_modify=False):
                 if member_to_update < 0 or member_to_update >= len(members):
                     main.clear()
                     print("Invalid input")
-                    log_instance.log_activity(super_username, "Search member", "Invalid input in the search member menu", "No")
+                    log_instance.log_activity(username, "Search member", "Invalid input in the search member menu", "No")
                     time.sleep(2)
                     continue
                 return members[member_to_update][0]
