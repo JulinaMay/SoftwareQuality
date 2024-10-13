@@ -2,8 +2,9 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 from datetime import datetime
-from cryptography import *
+from safe_data import *
 import main
+import ast
 
 
 class logmanager:
@@ -36,8 +37,8 @@ class logmanager:
 
     # Function to log activities
     def log_activity(self, username, description, additional_info=None, suspicious='No'):
-        # Construct the log message based on provided information
         log_entry = f"{username} - {description} - {additional_info or ''} - Suspicious: {suspicious}"
+        log_entry = encrypt_data(public_key(), log_entry)
 
         if suspicious == 'Yes':
             self.logger.warning(log_entry)
@@ -73,7 +74,12 @@ class logmanager:
 
                     print(f"\n--- Page {page + 1} / {pages} ---\n")
                     for line in current_page_lines:
-                        print(line.strip())
+                        line = line.split(" - ")
+                        line[2] = ast.literal_eval(line[2])
+                        print(str(line[0]), "- ", end="")
+                        print(str(line[1]), "- ", end="")
+                        print(decrypt_data(private_key(), line[2]))
+
 
                     print("\n1. Next page")
                     print("2. Previous page")
